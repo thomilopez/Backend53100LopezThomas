@@ -1,0 +1,74 @@
+{
+    "productos": [
+        {
+            "id": 1,
+            "title": "Camiseta de Argentina",
+            "description": "Camiseta de manga corta",
+            "price": 20,
+            "thumbnail": "https://example.com/camiseta.jpg"
+        },
+        {
+            "id": 2,
+            "title": "Pantalones",
+            "description": "Pantalones vaqueros de color azul",
+            "price": 50,
+            "thumbnail": "https://example.com/pantalones.jpg"
+        },
+        {
+            "id": 3,
+            "title": "Zapatos",
+            "description": "Zapatos de cuero negro",
+            "price": 80,
+            "thumbnail": "https://example.com/zapatos.jpg"
+        },
+        {
+            "id": 4,
+            "title": "Zapatos rojos",
+            "description": "Zapatos de cuero rojos",
+            "price": 80,
+            "thumbnail": "https://example.com/zapatos.jpg"
+        },
+        {
+            "id": 5,
+            "title": "Zapatos verdes",
+            "description": "Zapatos de cuero verdes",
+            "price": 80,
+            "thumbnail": "https://example.com/zapatos.jpg"
+        },
+        {
+            "id": 10,
+            "title": "Remera",
+            "description": "Remera lisa blanca",
+            "price": 80,
+            "thumbnail": "https://example.com/zapatos.jpg"
+        },
+        {
+            "id": 6,
+            "title": "Remera",
+            "description": "Remera lisa roja",
+            "price": 80,
+            "thumbnail": "https://example.com/zapatos.jpg"
+        },
+        {
+            "id": 7,
+            "title": "Remera",
+            "description": "Remera lisa azul",
+            "price": 80,
+            "thumbnail": "https://example.com/zapatos.jpg"
+        },
+        {
+            "id": 8,
+            "title": "Remera",
+            "description": "Remera lisa blanca y negro",
+            "price": 80,
+            "thumbnail": "https://example.com/zapatos.jpg"
+        },
+        {
+            "id": 9,
+            "title": "Camisa",
+            "description": "Camisa de vestir color gris",
+            "price": 80,
+            "thumbnail": "https://example.com/zapatos.jpg"
+        }
+        ]
+}
