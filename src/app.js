@@ -1,7 +1,9 @@
 const express = require('express');
-const ProductManager = require('./ProductManager');
-
 const app = express();
+const productsRouter = require('./routes/productsRouter');
+const cartsRouter = require('./routes/cartsRouter');
+
+const ProductManager = require('./ProductManager');
 const productManager = new ProductManager('/product.json');
 
     app.get('/products', async (req, res) => {
@@ -34,7 +36,18 @@ const productManager = new ProductManager('/product.json');
         res.status(500).json({ error: 'Error al obtener el producto.' });
     }
     });
+    app.listen(8080, () => {
+    console.log('Servidor en ejecución en el puerto 8080');
+    });
+    // viejo 
 
-    app.listen(3000, () => {
-    console.log('Servidor en ejecución en el puerto 3000');
+    //nuevo 
+    app.use(express.json());
+
+    app.use('/api/products', productsRouter);
+    app.use('/api/carts', cartsRouter);
+
+    const PORT = 8080;
+    app.listen(PORT, () => {
+        console.log(`Servidor en ejecución en el puerto ${PORT}`);
     });
