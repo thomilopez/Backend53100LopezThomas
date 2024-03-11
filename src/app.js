@@ -3,9 +3,9 @@ import handlebars from 'express-handlebars';
 import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
-import viewsRouter from './routes/viewsRoutes.js';
 import productsRouter from './routes/productsRoutes.js';
 import cartsRouter from './routes/cartsRouter.js';
+import router from './routes/viewsRouter.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 
-app.use('/', viewsRouter);
+app.use('/', router);
 app.use('/products', productsRouter);
 app.use('/carts', cartsRouter);
 

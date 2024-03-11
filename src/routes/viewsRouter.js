@@ -11,4 +11,4 @@ router.get('/realtimeproducts', (req, res) => {
     res.render('realTimeProducts');
 });
 
-export default viewsRouter;
+export default router;
