@@ -1,21 +1,20 @@
-const express = require('express');
+import express from 'express';
+import ProductManager from '../models/ProductManager';
 const productsRouter = express.Router();
-const ProductManager = require('../ProductManager');
 const productManager = new ProductManager('products.json');
+
 
 productsRouter.get('/', async (req, res) => {
     try {
-        const limit = req.query.limit ? parseInt(req.query.limit) : undefined;
         const products = await productManager.getProducts();
-        if (limit) {
-            res.json(products.slice(0, limit));
-        } else {
-            res.json(products);
-        }
+        res.render('home', { products });
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener los productos.' });
     }
 });
+
+
+
 
 productsRouter.get('/:pid', async (req, res) => {
     try {
@@ -63,4 +62,6 @@ productsRouter.delete('/:pid', async (req, res) => {
     }
 });
 
-module.exports = productsRouter;
+export default productsRouter;
+
+

@@ -1,0 +1,17 @@
+handlebars
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Productos en Tiempo Real</title>
+</head>
+<body>
+    <h1>Productos en Tiempo Real</h1>
+    <ul>
+        {{#each products}}
+            <li>{{this.name}} - {{this.price}}</li>
+        {{/each}}
+    </ul>
+</body>
+</html>
+  

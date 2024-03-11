@@ -1,4 +1,4 @@
-const fs = require('fs').promises;
+import fs from 'fs/promises';
 
     class ManagerUsuarios {
     constructor() {
@@ -57,4 +57,4 @@ const fs = require('fs').promises;
     }
     }
 
-    module.exports = ManagerUsuarios;
+    export default ManagerUsuarios;

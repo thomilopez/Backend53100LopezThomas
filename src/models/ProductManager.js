@@ -1,5 +1,6 @@
-const fs = require('fs').promises;
+import fs from 'fs/promises';
 
+code
 class ProductManager {
     constructor(path) {
         this.path = path;
@@ -91,4 +92,4 @@ class ProductManager {
     }
     }
 
-module.exports = ProductManager;
+export default ProductManager;
