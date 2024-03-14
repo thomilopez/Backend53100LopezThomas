@@ -1,6 +1,5 @@
 import fs from 'fs/promises';
 
-code
 class ProductManager {
     constructor(path) {
         this.path = path;
