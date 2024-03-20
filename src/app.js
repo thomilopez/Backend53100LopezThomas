@@ -1,6 +1,5 @@
 import express from 'express';
 import handlebars from 'express-handlebars';
-import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
 import productsRouter from './routes/productsRouter.js';
@@ -9,8 +8,19 @@ import router from './routes/viewsRouter.js';
 import __dirname from './utils.js';
 
 const app = express();
-const server = http.createServer(app);
+
+const PORT = process.env.PORT || 8080;
+
+const server = app.listen(PORT, () => {
+
+    console.log(`Servidor en ejecución en http://localhost:${PORT}`);
+
+});
+
 const io = new Server(server);
+
+
+
 
 app.engine('handlebars',  handlebars.engine({
     layoutsDir: path.join(__dirname, 'views/layouts'),
@@ -34,16 +44,23 @@ app.use('/products', productsRouter);
 
 app.use('/carts', cartsRouter);
 
+io.on("connection", (socket) => {
+    console.log("Usuario conectado");
 
-io.on('connection', (socket) => {
-    console.log('Usuario conectado');
-    socket.on('disconnect', () => {
-        console.log('Usuario desconectado');
+    socket.on("disconnect", () => {
+        console.log("Usuario desconectado");
     });
+
+	socket.on('addProduct', async (product) => {
+        try {
+        const productAdded = await ProductManager.addProduct(product)
+        console.log('Nuevo producto recibido:', product);   
+        io.emit('addToTheList', productAdded)
+
+        } catch (error) {
+            console.error(error.message)
+        }
+    })
 });
 
-const PORT = process.env.PORT || 8080;
 
-server.listen(PORT, () => {
-    console.log(`Servidor en ejecución en http://localhost:${PORT}`);
-});
