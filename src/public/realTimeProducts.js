@@ -9,7 +9,6 @@
 
 const socket = io();
 
-
 document.getElementById('productForm').addEventListener('submit', (event) => {
     event.preventDefault(); 
 
