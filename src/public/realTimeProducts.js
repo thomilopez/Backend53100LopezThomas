@@ -1,11 +1,3 @@
-// const socket = io();
-
-// socket.on('addToTheList', (product) => {
-//     const productList = document.getElementById('productList');
-//     const newProduct = document.createElement('li');
-//     newProduct.innerText = `${product.name} - ${product.price}`;
-//     productList.appendChild(newProduct);
-// });
 
 const socket = io();
 

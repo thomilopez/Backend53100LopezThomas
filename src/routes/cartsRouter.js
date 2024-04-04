@@ -1,20 +1,20 @@
 import express from 'express';
-import CartManager from '../models/CartManager.js';
+import CartManagerNew from '../models/services/cartManagerNew.js'
+import io from '../app.js';
 
 const cartsRouter = express.Router();
-const cartManager = new CartManager('cart.json');
+const cartManager = new CartManagerNew();
 
 
 cartsRouter.post('/', async (req, res) => {
     try {
+        const newCart = await cartManager.createCart();
         io.emit('cartCreated', newCart);
         res.render('realTimeProducts', { products }); 
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 });
-
-
 
 cartsRouter.get('/:cid', async (req, res) => {
     try {

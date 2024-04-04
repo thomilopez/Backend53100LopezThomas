@@ -10,7 +10,8 @@ class ProductManager {
             const productos = await this.getProducts();
             const lastId = productos.length > 0 ? productos[productos.length - 1].id : 0;
             const newProduct = { id: lastId + 1, ...producto };
-            
+
+            // Validaciones de campos
             if (!newProduct.title || !newProduct.description || !newProduct.price) {
                 throw new Error('Los campos "title", "description" y "price" son obligatorios.');
             }
@@ -24,16 +25,20 @@ class ProductManager {
                 throw new Error('El campo "price" debe ser un número positivo.');
             }
             const existingProduct = productos.find((p) => p.code === newProduct.code);
-                if (existingProduct) {
-                    throw new Error('El campo "code" debe ser único.');
-                }
+            if (existingProduct) {
+                throw new Error('El campo "code" debe ser único.');
+            }
+
             productos.push(newProduct);
             await fs.writeFile(this.path, JSON.stringify(productos));
-                console.log('Producto agregado exitosamente.');
+            console.log('Producto agregado exitosamente.');
+            return newProduct; // Devuelve el producto agregado
         } catch (error) {
             console.error('Error al agregar el producto:', error);
+            throw error; // Re-lanza el error para que sea manejado en otro lugar si es necesario
         }
     }
+
 
     async getProducts() {
         try {

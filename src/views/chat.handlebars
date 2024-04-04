@@ -1,0 +1,119 @@
+  handlebars
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat en Tiempo Real</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .chat-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .chat-messages {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: scroll;
+            max-height: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .message {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .message.user {
+            background-color: #f9f9f9;
+        }
+        .message.bot {
+            background-color: #e1f5fe;
+        }
+        .message-content {
+            margin-left: 10px;
+        }
+        .message-content p {
+            margin: 0;
+        }
+        .message-content .timestamp {
+            font-size: 0.8em;
+            color: #888;
+        }
+        .chat-input {
+            display: flex;
+            margin-top: 10px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        .chat-input button {
+            padding: 8px 15px;
+            margin-left: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <ul class="chat-messages">
+            {{#each messages}}
+                <li class="message {{#if isUser}}user{{else}}bot{{/if}}">
+                    <div class="message-content">
+                        <p>{{message}}</p>
+                        <p class="timestamp">{{createdAt}}</p>
+                    </div>
+                </li>
+            {{/each}}
+        </ul>
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Escribe un mensaje...">
+            <button id="sendButton">Enviar</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            if (message !== '') {
+                socket.emit('newMessage', { user: 'Usuario', message });
+                messageInput.value = '';
+            }
+        });
+
+        socket.on('newMessage', (data) => {
+            const chatMessages = document.querySelector('.chat-messages');
+            const newMessage = document.createElement('li');
+            newMessage.className = 'message user';
+            newMessage.innerHTML = `
+                <div class="message-content">
+                    <p>${data.message}</p>
+                    <p class="timestamp">${new Date().toLocaleString()}</p>
+                </div>
+            `;
+            chatMessages.appendChild(newMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+    </script>
+</body>
+</html>
+  

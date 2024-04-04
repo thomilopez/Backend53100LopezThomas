@@ -1,25 +1,23 @@
 import express from 'express';
-import ProductManager from '../models/ProductManager.js';
+// import ProductManager from '../models/ProductManager.js';
+import ProductManagerNew from '../models/services/productManagerNew.js';
 const productsRouter = express.Router();
-const productManager = new ProductManager('products.json');
+const productManager = new ProductManagerNew();
 
 
 productsRouter.get('/', async (req, res) => {
     try {
-        const products = await productManager.getProducts();
+        const products = await productManager.getAll();
         res.render('home', { products });
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener los productos.' });
     }
 });
 
-
-
-
 productsRouter.get('/:pid', async (req, res) => {
     try {
         const productId = parseInt(req.params.pid);
-        const products = await productManager.getProducts();
+        const products = await productManager.getAll();
         const product = products.find((p) => p.id === productId);
         if (product) {
             res.json(product);
@@ -63,5 +61,4 @@ productsRouter.delete('/:pid', async (req, res) => {
 });
 
 export default productsRouter;
-
 
