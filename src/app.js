@@ -7,7 +7,7 @@ import cartsRouter from './routes/cartsRouter.js';
 import chatRouter from './routes/chatRouter.js';
 import router from './routes/viewsRouter.js';
 import __dirname from './utils.js';
-import ProductManager from './models/ProductManager.js';
+// import ProductManager from './models/ProductManager.js';
 import mongoose from 'mongoose';
 import ProductManagerNew from './models/services/productManagerNew.js';
 

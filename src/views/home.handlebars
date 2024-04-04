@@ -1,16 +1,49 @@
-handlebars
+  handlebars
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Lista de Productos</title>
+    <style>
+        .product {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .product img {
+            width: 100px;
+            height: 100px;
+            margin-right: 20px;
+        }
+        .product-info {
+            flex: 1;
+        }
+        .product button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <h1>Lista de Productos</h1>
     <ul>
         {{#each products}}
-            <li>{{this.name}} - {{this.price}}</li>
+            <li class="product">
+                <img src="{{this.thumbnail}}" alt="{{this.title}}">
+                <div class="product-info">
+                    <h3>{{this.title}}</h3>
+                    <p>{{this.description}}</p>
+                    <p>Precio: ${{this.price}}</p>
+                </div>
+                <button onclick="addToCart('{{this._id}}')">Agregar al Carrito</button>
+            </li>
         {{/each}}
     </ul>
+
 </body>
 </html>
+  

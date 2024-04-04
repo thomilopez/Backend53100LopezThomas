@@ -1,24 +1,43 @@
-handlebars
+ handlebars
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Productos en Tiempo Real</title>
+    <style>
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .product {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        .product img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Productos en Tiempo Real</h1>
-    <ul id="productList">
+    <div class="product-list">
         {{#each products}}
-            <li>{{this.name}} - {{this.price}}</li>
+            <div class="product">
+                <img src="{{this.thumbnail}}" alt="{{this.title}}">
+                <h3>{{this.title}}</h3>
+                <p>Precio: ${{this.price}}</p>
+            </div>
         {{/each}}
-    </ul>
-
+    </div>
     <form id="productForm">
         <input type="text" id="productName" placeholder="Nombre del producto">
         <input type="number" id="productPrice" placeholder="Precio del producto">
         <button type="submit">Agregar Producto</button>
     </form>
-
     <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
     <script src="/realTimeProducts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
