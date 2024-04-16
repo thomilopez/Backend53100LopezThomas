@@ -21,20 +21,19 @@ export default class CartManagerNew {
         if (product){
             product.quantity += quantity;
         } else {
-            cart.products.push({ product: pid, quantity})
+            cart.product.push({ product: pid, quantity})
         }
         return await cart.save();
     }
 
     deleteProduct = async (cid, pid) => {
         let cart = await cartModel.findById(cid)
-        let product = cart.product.find((product) => product.product.toString() === pid )
-
-        if(product=== 0){
-            console.log("Producto no encontrado")
-        }else{
-            cart.product.splice(product,1)
-        }
+        let index = cart.product.findIndex((product) => product.product.toString() === pid);
+            if (index === -1) {
+        console.log("Producto no encontrado");
+            } else {
+        cart.product.splice(index, 1);
+            }
         return await cart.save();
     }
 }

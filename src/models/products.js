@@ -19,7 +19,7 @@ const schema = new Schema({
         type: [String],
         required: true
     },
-    caterogy: {
+    category: {
         type: String,
         required: true
     },
