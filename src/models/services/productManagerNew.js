@@ -12,8 +12,12 @@ export default class ProductManagerNew {
         return result
     }
     getById = async (id) => {
-        let result = await productModel.findById(id)
-        return result
+        try {
+            const product = await productModel.findById(id);
+            return product;
+        } catch (error) {
+            console.error("Error al buscar el producto por ID:", error);
+        }
     }
     getByBrand = async (brand) => {
         let result = await productModel.find({brand: brand})

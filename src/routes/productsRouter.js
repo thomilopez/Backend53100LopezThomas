@@ -4,11 +4,30 @@ import ProductManagerNew from '../models/services/productManagerNew.js';
 const productsRouter = express.Router();
 const productManager = new ProductManagerNew();
 
-
 productsRouter.get('/', async (req, res) => {
+    const { limit = 10, page = 1, sort, query } = req.query;
+    
     try {
-        const products = await productManager.getAll();
-        res.render('home', { products });
+        const products = await productManager.getAll(limit, page, sort, query);
+        
+        const totalPages = Math.ceil(products.length / limit);
+        const prevPage = page > 1 ? parseInt(page) - 1 : null;
+        const nextPage = page < totalPages ? parseInt(page) + 1 : null;
+        const hasPrevPage = prevPage !== null;
+        const hasNextPage = nextPage !== null;
+
+        res.json({
+            status: 'success',
+            payload: products,
+            totalPages,
+            prevPage,
+            nextPage,
+            page: parseInt(page),
+            hasPrevPage,
+            hasNextPage,
+            prevLink: hasPrevPage ? `/api/products?limit=${limit}&page=${prevPage}&sort=${sort}&query=${query}` : null,
+            nextLink: hasNextPage ? `/api/products?limit=${limit}&page=${nextPage}&sort=${sort}&query=${query}` : null
+        });
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener los productos.' });
     }
@@ -33,7 +52,7 @@ productsRouter.post('/', async (req, res) => {
     try {
         const newProduct = req.body;
         await productManager.addProduct(newProduct);
-        res.json({ message: 'Producto agregado exitosamente.' });
+        res.json({ message: 'Producto agregado exitosamente.' }, newProduct);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -44,7 +63,7 @@ productsRouter.put('/:pid', async (req, res) => {
         const productId = parseInt(req.params.pid);
         const updatedFields = req.body;
         await productManager.updateProduct(productId, updatedFields);
-        res.json({ message: 'Producto actualizado exitosamente.' });
+        res.json({ message: 'Producto actualizado exitosamente.', updatedFields});
     } catch (error) {
         res.status(400).json({ error: error.message });
     }

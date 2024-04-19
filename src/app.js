@@ -60,9 +60,9 @@ app.use(express.json());
 
 app.use('/', router);
 
-app.use('/products', productsRouter);
+app.use('/api/products', productsRouter);
 
-app.use('/carts', cartsRouter);
+app.use('/api/carts', cartsRouter);
 
 app.use('/chat', chatRouter);
 
