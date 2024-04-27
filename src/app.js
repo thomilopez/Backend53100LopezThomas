@@ -12,7 +12,7 @@ import mongoose from 'mongoose';
 import ProductManagerNew from './models/services/productManagerNew.js';
 
 const connectMongoDB = async () => {
-    const DB_URL = 'mongodb://127.0.0.1:27017/ecommerce?retryWrites=true&w=majority'
+    const DB_URL = 'mongodb+srv://thomasignaciolopez:Vzj0a0fdqqLm9SsI@cluster0.0p9eir3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
 
     try{
         await mongoose.connect(DB_URL)
