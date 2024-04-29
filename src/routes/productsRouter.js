@@ -1,35 +1,41 @@
 import express from 'express';
 // import ProductManager from '../models/ProductManager.js';
 import ProductManagerNew from '../models/services/productManagerNew.js';
-const productsRouter = express.Router();
+import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
+const productsRouter = express.Router();
+const productManager = new ProductManagerNew();
+
+productManager.productModel.plugin(mongoosePaginate);
 
 productsRouter.get('/', async (req, res) => {
-    const { limit = 10, page = 1, sort, query } = req.query;
-    
+    const { page = 1, limit = 10, sort, query } = req.query;
+
     try {
-        const products = await productManager.getAll(limit, page, sort, query);
-        
-        const totalPages = Math.ceil(products.length / limit);
-        const prevPage = page > 1 ? parseInt(page) - 1 : null;
-        const nextPage = page < totalPages ? parseInt(page) + 1 : null;
-        const hasPrevPage = prevPage !== null;
-        const hasNextPage = nextPage !== null;
+        const options = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            sort: sort ? { price: sort === 'asc' ? 1 : -1 } : undefined,
+            populate: 'products' 
+        };
+
+        const result = await productManager.productModel.paginate({}, options);
 
         res.json({
             status: 'success',
-            payload: products,
-            totalPages,
-            prevPage,
-            nextPage,
-            page: parseInt(page),
-            hasPrevPage,
-            hasNextPage,
-            prevLink: hasPrevPage ? `/api/products?limit=${limit}&page=${prevPage}&sort=${sort}&query=${query}` : null,
-            nextLink: hasNextPage ? `/api/products?limit=${limit}&page=${nextPage}&sort=${sort}&query=${query}` : null
+            payload: result.docs,
+            totalPages: result.totalPages,
+            prevPage: result.hasPrevPage ? result.prevPage : null,
+            nextPage: result.hasNextPage ? result.nextPage : null,
+            page: result.page,
+            hasPrevPage: result.hasPrevPage,
+            hasNextPage: result.hasNextPage,
+            prevLink: result.hasPrevPage ? `/api/products?page=${result.prevPage}&limit=${limit}&sort=${sort}&query=${query}` : null,
+            nextLink: result.hasNextPage ? `/api/products?page=${result.nextPage}&limit=${limit}&sort=${sort}&query=${query}` : null
         });
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener los productos.' });
+        res.status(500).json({ error: 'Error al obtener los productos paginados.' });
     }
 });
 

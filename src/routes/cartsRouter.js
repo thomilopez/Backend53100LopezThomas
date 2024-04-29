@@ -5,6 +5,8 @@ import io from '../app.js';
 const cartsRouter = express.Router();
 const cartManager = new CartManagerNew();
 
+
+
 cartsRouter.delete('/:cid/products/:pid', async (req, res) => {
     try {
         const { cid, pid } = req.params;
