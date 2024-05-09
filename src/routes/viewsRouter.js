@@ -1,11 +1,26 @@
-import express from 'express';
-const router = express.Router();
+import { Router } from 'express';
+import auth from "../middlewares/auth.js"
 
+const router = Router();
 
-router.get('/', (req, res) => {
-    res.render('home');
+router.get("/register", (req, res) => {
+    res.render("register");
 });
 
+router.get("/login", (req, res) => {
+    res.render("login");
+});
+  
+router.get("/", auth, (req, res) => {
+    res.render("profile", {
+        user: req.session.user,
+    });
+});
+  //restaurar password
+router.get("/restore", (req, res) => {
+    res.render("restore");
+});
+  
 
 router.get('/realtimeproducts', (req, res) => {
     res.render('realTimeProducts');

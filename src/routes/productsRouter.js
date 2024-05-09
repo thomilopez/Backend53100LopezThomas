@@ -1,13 +1,8 @@
 import express from 'express';
-// import ProductManager from '../models/ProductManager.js';
 import ProductManagerNew from '../models/services/productManagerNew.js';
-import mongoose from 'mongoose';
-import mongoosePaginate from 'mongoose-paginate-v2';
 
 const productsRouter = express.Router();
 const productManager = new ProductManagerNew();
-
-productManager.productModel.plugin(mongoosePaginate);
 
 productsRouter.get('/', async (req, res) => {
     const { page = 1, limit = 10, sort, query } = req.query;

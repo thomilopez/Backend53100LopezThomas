@@ -10,6 +10,14 @@ import __dirname from './utils.js';
 // import ProductManager from './models/ProductManager.js';
 import mongoose from 'mongoose';
 import ProductManagerNew from './models/services/productManagerNew.js';
+import MongoStore from 'connect-mongo';
+import session from 'express-session';
+import FileStore from 'session-file-store';
+import sessionRouter from './routes/sessions.router.js';
+import passport from 'passport';
+import initializePassport from './config/passaportConfig.js';
+
+
 
 const connectMongoDB = async () => {
     const DB_URL = 'mongodb+srv://thomasignaciolopez:Vzj0a0fdqqLm9SsI@cluster0.0p9eir3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
@@ -30,6 +38,8 @@ const app = express();
 
 const PORT = process.env.PORT || 8080;
 
+const fileStorage = FileStore(session);
+
 const server = app.listen(PORT, () => {
 
     console.log(`Servidor en ejecución en http://localhost:${PORT}`);
@@ -39,6 +49,9 @@ const server = app.listen(PORT, () => {
 const io = new Server(server);
 
 const productManager = new ProductManagerNew();
+
+const DB_URL2 = 'mongodb+srv://thomasignaciolopez:Vzj0a0fdqqLm9SsI@cluster0.0p9eir3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+
 
 
 
@@ -50,17 +63,41 @@ app.engine('handlebars',  handlebars.engine({
 
 app.set('view engine', 'handlebars');
 
+
+
 app.set("views", path.join(__dirname, 'views'));
 
 app.set('socketio', io);
+
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(express.json());
 
+app.use(
+        session({
+        //store: new fileStorage({ path: "./sessions", ttl: 10, retries: 0 }),
+        store: MongoStore.create({
+            mongoUrl: DB_URL2,
+            ttl: 15,
+        }),
+        secret: "hola",
+        resave: false,
+        saveUninitialized: false,
+        })
+    );
+
+// //usando passport
+// initializePassport()
+// app.use(passport.initialize())
+// app.use(passport.session())
+
 app.use('/', router);
 
 app.use('/api/products', productsRouter);
+
+app.use('/api/sessions', sessionRouter);
 
 app.use('/api/carts', cartsRouter);
 
