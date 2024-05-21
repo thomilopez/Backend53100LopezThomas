@@ -2,6 +2,7 @@ import passport from "passport";
 import local from "passport-local";
 import userModel from "../models/usersModel.js";
 import { createHash, isValidPassword } from "../utils.js";
+import GitHubStrategy from "passport-github2";
 
 const LocalStrategy = local.Strategy;
 
@@ -17,7 +18,7 @@ const initializePassport = () => {
             const user = await userModel.findOne({ email: username });
             if (user) {
                 console.log("Usuario existente");
-                return done(null, false); // Indica que el usuario existe (sin error)
+                return done(null, false); 
             }
 
             const newUser = {
@@ -25,20 +26,20 @@ const initializePassport = () => {
                 last_name,
                 email,
                 age,
-                password: createHash(password), // Hashear la contraseña
+                password: createHash(password), 
             };
 
             // Guardar el usuario
             const result = await userModel.create(newUser);
-            return done(null, result); // Pasar el usuario creado al éxito
+            return done(null, result); 
             } catch (error) {
-            return done(error); // Pasar el error si hay alguno
+            return done(error); 
             }
         }
         )
     );
 
-  //estrategia local para despues
+
 passport.use(
     "login",
         new LocalStrategy(
@@ -58,6 +59,41 @@ passport.use(
         )
     );
 
+    passport.use(
+    "github",
+        new GitHubStrategy(
+        {
+            clientID: "Iv23lio7O397p8vdBPXu", 
+            clientSecret: "f4d92c1eba940055b887e56774f6ea5b473ea066", 
+            callbackURL: "http://localhost:8080/api/sessions/githubcallback", 
+        },
+        async (accessToken, refreshToken, profile, done) => {
+            try {
+            console.log(profile); 
+            const user = await userModel.findOne({
+                email: profile._json.email,
+            });
+            if (!user) {
+                const newUser = {
+                first_name: profile._json.name,
+                last_name: "",
+                age: 20,
+                email: profile._json.email,
+                password: "",
+                };
+                let createdUser = await userModel.create(newUser);
+                done(null, createdUser);
+            } else {
+                done(null, user);
+            }
+            } catch (error) {
+            return done(error);
+            }
+        }
+        )
+    );
+
+
   //Serializar y deserializar usuario
 
 passport.serializeUser((user, done) => {
@@ -73,5 +109,9 @@ passport.deserializeUser(async (id, done) => {
         }
     });
     };
+
+
+
+
 
 export default initializePassport;

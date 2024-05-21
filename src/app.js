@@ -7,7 +7,6 @@ import cartsRouter from './routes/cartsRouter.js';
 import chatRouter from './routes/chatRouter.js';
 import router from './routes/viewsRouter.js';
 import __dirname from './utils.js';
-// import ProductManager from './models/ProductManager.js';
 import mongoose from 'mongoose';
 import ProductManagerNew from './models/services/productManagerNew.js';
 import MongoStore from 'connect-mongo';
@@ -88,10 +87,10 @@ app.use(
         })
     );
 
-// //usando passport
-// initializePassport()
-// app.use(passport.initialize())
-// app.use(passport.session())
+//usando passport
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use('/', router);
 
