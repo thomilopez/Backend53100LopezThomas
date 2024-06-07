@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 
-    class ManagerUsuarios {
+
+class ManagerUsuarios {
     constructor() {
         this.path = 'package.json';
     }

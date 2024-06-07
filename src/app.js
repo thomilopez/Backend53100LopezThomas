@@ -15,7 +15,7 @@ import FileStore from 'session-file-store';
 import sessionRouter from './routes/sessions.router.js';
 import passport from 'passport';
 import initializePassport from './config/passaportConfig.js';
-
+import cookieParser from 'cookie-parser';
 
 
 const connectMongoDB = async () => {
@@ -40,18 +40,13 @@ const PORT = process.env.PORT || 8080;
 const fileStorage = FileStore(session);
 
 const server = app.listen(PORT, () => {
-
     console.log(`Servidor en ejecución en http://localhost:${PORT}`);
-
 });
 
 const io = new Server(server);
-
 const productManager = new ProductManagerNew();
 
 const DB_URL2 = 'mongodb+srv://thomasignaciolopez:Vzj0a0fdqqLm9SsI@cluster0.0p9eir3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
-
-
 
 
 app.engine('handlebars',  handlebars.engine({
@@ -61,19 +56,13 @@ app.engine('handlebars',  handlebars.engine({
 }));
 
 app.set('view engine', 'handlebars');
-
-
-
 app.set("views", path.join(__dirname, 'views'));
-
 app.set('socketio', io);
 
 app.use(express.urlencoded({ extended: true }));
-
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(express.json());
-
+app.use(cookieParser());
 app.use(
         session({
         //store: new fileStorage({ path: "./sessions", ttl: 10, retries: 0 }),
@@ -86,21 +75,22 @@ app.use(
         saveUninitialized: false,
         })
     );
-
+// Middleware para manejar errores de autenticación de Passport
+app.use((err, req, res, next) => {
+    if (err) {
+        console.error(err);
+        res.status(401).json({ error: 'Error de autenticación' });
+    }
+});
 //usando passport
 initializePassport()
 app.use(passport.initialize())
-app.use(passport.session())
-
 app.use('/', router);
-
 app.use('/api/products', productsRouter);
-
 app.use('/api/sessions', sessionRouter);
-
 app.use('/api/carts', cartsRouter);
-
 app.use('/chat', chatRouter);
+
 
 io.on("connection", (socket) => {
     console.log("Usuario conectado");
