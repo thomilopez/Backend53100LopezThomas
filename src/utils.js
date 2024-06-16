@@ -2,8 +2,10 @@ import {fileURLToPath} from 'url';
 import { dirname } from 'path';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { entorno } from './config/config.js';
 
-const JWT_SECRET = "hola";
+
+const JWT_SECRET = entorno.secretJWT
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

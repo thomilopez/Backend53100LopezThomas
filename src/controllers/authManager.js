@@ -1,5 +1,5 @@
-import userModel from "../usersModel";
-import { isValidPassword, generateToken } from "../../utils";
+import userModel from "../persistencia/usersModel.js";
+import { isValidPassword, generateToken } from "../utils.js";
 
 export default class AuthManager {
     constructor() {

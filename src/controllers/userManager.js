@@ -1,5 +1,5 @@
-import { createHash } from "../../utils";
-import userModel from "../usersModel";
+import { createHash } from "../utils.js";
+import userModel from "../persistencia/usersModel.js";
 
 export default class UserManager {
     constructor() {

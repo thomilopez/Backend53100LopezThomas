@@ -1,4 +1,4 @@
-import chatModel from "../messagess.js";
+import chatModel from "../persistencia/messagess.js";
 
 export default class ChatManager {
     constructor() {

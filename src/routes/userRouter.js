@@ -1,6 +1,8 @@
 import { Router } from "express";
-import UserManager from "../models/services/userManager";
-import AuthManager from "../models/services/authManager";
+// import UserManager from "../models/services/userManager";
+// import AuthManager from "../models/services/authManager";
+import UserManager from "../controllers/userManager";
+import AuthManager from "../controllers/authManager";
 import passport from "passport";
 
 const router = Router();
