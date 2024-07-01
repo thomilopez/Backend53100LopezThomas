@@ -1,5 +1,5 @@
 import { createHash } from "../utils.js";
-import userModel from "../persistencia/usersModel.js";
+import userModel from "../persistencia/models/usersModel.js";
 
 export default class UserManager {
     constructor() {
@@ -14,6 +14,11 @@ export default class UserManager {
     getById = async (id) => {
         const result = await userModel.findById(id);
         return result;
+    };
+
+    getByEmail = async (email) => {
+    const result = await userModel.findOne({ email: email });
+    return result;
     };
   
     createUser = async (userData) => {

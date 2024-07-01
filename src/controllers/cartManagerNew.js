@@ -1,4 +1,4 @@
-import cartModel from '../persistencia/carts.js';
+import cartModel from '../persistencia/models/carts.js'
 
 
 export default class CartManagerNew {

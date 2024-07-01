@@ -1,12 +1,12 @@
 import express from 'express';
-// import CartManagerNew from '../models/services/cartManagerNew.js'
 import CartManagerNew from '../controllers/cartManagerNew.js';
 import io from '../app.js';
+import TicketModel from '../controllers/ticketManager.js';
 
+
+const ticketManager = new TicketModel();
 const cartsRouter = express.Router();
 const cartManager = new CartManagerNew();
-
-
 
 cartsRouter.delete('/:cid/products/:pid', async (req, res) => {
     try {
@@ -82,5 +82,59 @@ cartsRouter.post('/:cid/product/:pid', async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 });
+
+
+cartsRouter.post('/:cid/purchase', async (req, res) => {
+    const cartId = req.params.cid;
+
+    try {
+        // Obtener el carrito desde la base de datos
+        const cart = await cartManager.findByCartId(cartId);
+
+        // Verificar el stock de cada producto en el carrito
+        const productsToUpdate = [];
+        const productsNotPurchased = [];
+
+        for (const product of cart.products) {
+            const productInStock = await ProductRepository.findById(product.productId);
+
+            if (productInStock.stock >= product.quantity) {
+                // Restar la cantidad comprada del stock disponible
+                productInStock.stock -= product.quantity;
+                productsToUpdate.push(productInStock);
+            } else {
+                productsNotPurchased.push(product.productId);
+            }
+        }
+
+        if (productsToUpdate.length === cart.products.length) {
+            
+            // Todos los productos tienen suficiente stock
+            await Promise.all(productsToUpdate.map(product => product.save()));
+
+            // Crear y guardar el ticket
+            const ticketData = {
+                code: generateUniqueCode(),
+                purchase_datetime: new Date(),
+                amount: calculateTotalAmount(cart.products),
+                purchaser: req.user.email // o el usuario asociado al carrito
+            };
+            const newTicket = await ticketManager.createTicket(ticketData);
+
+            // Actualizar el carrito con los productos no comprados
+            cart.products = cart.products.filter(product => !productsNotPurchased.includes(product.productId));
+            await cart.save();
+
+            res.status(200).json({ message: 'Compra realizada con éxito', ticket: newTicket });
+        } else {
+            // Algunos productos no tienen suficiente stock
+            res.status(400).json({ message: 'Algunos productos no tienen suficiente stock', productsNotPurchased });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error al procesar la compra' });
+    }
+});
+
+
 
 export default cartsRouter;

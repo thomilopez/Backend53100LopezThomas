@@ -5,10 +5,16 @@ const { Schema } = mongoose;
 const collection = "carts"
 
 const schema = new Schema({
-
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users',
+        required: true
+    },
     products: [{
-        product: {
-            type: mongoose.Schema.Types.ObjectId, ref: "products"
+        productId: {
+            type: mongoose.Schema.Types.ObjectId, 
+            ref: "products",
+            required: true
         },
 
         quantity: {

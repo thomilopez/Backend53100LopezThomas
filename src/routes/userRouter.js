@@ -1,10 +1,8 @@
 import { Router } from "express";
-// import UserManager from "../models/services/userManager";
-// import AuthManager from "../models/services/authManager";
-import UserManager from "../controllers/userManager";
-import AuthManager from "../controllers/authManager";
+import UserManager from "../controllers/userManager.js";
+import AuthManager from "../controllers/authManager.js";
 import passport from "passport";
-
+import usersDAO from "../persistencia/DAO/usersDAO.js";
 const router = Router();
 
 const userManager = new UserManager();
@@ -82,9 +80,9 @@ router.delete("/user/:id", async (req, res) => {
     }
 });
 
-  //login
+
 router.post("/login", async (req, res) => {
-    //lógica a implementar
+
     try {
         const { email, password } = req.body;
         const user = await authManager.login({ email, password });
@@ -100,9 +98,33 @@ router.post("/login", async (req, res) => {
         res.send({ status: "error", message: error });
     }
   });
-  // En tu archivo de rutas
+
   router.post("/logout", (req, res) => {
     //lógica a implementar
   });
+
+  router.get('/current', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+        // Aquí obtenemos el usuario desde el repositorio usando el DTO
+        const user = await userManager.getUserById(req.user.id);
+
+        // Crear DTO del usuario con la información necesaria
+        const userDTO = {
+            id: user._id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+            age: user.age,
+            rol: user.rol
+        };
+
+        // Enviar el DTO como respuesta
+        res.status(200).json(userDTO);
+    } catch (error) {
+        console.error(`Error al obtener el usuario actual: ${error}`);
+        res.status(500).json({ error: 'Error al obtener el usuario actual' });
+    }
+});
+
   
   export default router;

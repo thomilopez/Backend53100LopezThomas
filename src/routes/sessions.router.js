@@ -1,6 +1,5 @@
 import { Router } from "express";
-// import userModel from "../models/usersModel.js";
-import userModel from "../persistencia/usersModel.js";
+import userModel from "../persistencia/models/usersModel.js";
 import { createHash, isValidPassword } from "../utils.js";
 import passport from "passport";
 

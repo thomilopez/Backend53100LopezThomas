@@ -1,5 +1,4 @@
 import express from 'express';
-// import ProductManagerNew from '../models/services/productManagerNew.js';
 import ProductManagerNew from '../controllers/productManagerNew.js';
 
 const productsRouter = express.Router();

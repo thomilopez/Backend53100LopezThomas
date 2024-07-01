@@ -18,19 +18,10 @@ import initializePassport from './config/passaportConfig.js';
 import cookieParser from 'cookie-parser';
 import { entorno } from './config/config.js';
 import cors from 'cors'
+import nodemailer from 'nodemailer'
+import twilio from 'twilio';
+import MongoSingleton from './persistencia/mongoSingleton.js';
 
-
-const connectMongoDB = async () => { 
-    const DB_URL = entorno.mongoURL 
-    try{ 
-        await mongoose.connect(DB_URL) 
-        console.log("Conectado con mongoDB") 
-    }catch(error){ 
-        console.error("No se pudo conectar con MongoDB", error) 
-        process.exit() 
-    } 
-} 
-connectMongoDB() 
 const app = express(); 
 const PORT = entorno.port
 const fileStorage = FileStore(session); 
@@ -55,7 +46,6 @@ app.use(express.json());
 app.use(cookieParser()); 
 app.use( 
         session({ 
-        //store: new fileStorage({ path: "./sessions", ttl: 10, retries: 0 }), 
         store: MongoStore.create({ 
             mongoUrl: DB_URL2, 
             ttl: 15, 
@@ -65,6 +55,66 @@ app.use(
         saveUninitialized: false, 
         }) 
     ); 
+
+MongoSingleton.getInstance();
+//twilio
+const client = twilio(process.env.TWILIO_SSID, process.env.AUTH_TOKEN);
+//nodemailer
+const mailOptions = {
+    service: "gmail",
+    host: "smtp.gmail.com",
+    secure: false,
+    port: 587,
+    auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+    },
+};
+const transport = nodemailer.createTransport(mailOptions);
+
+//mail route
+app.get("/mail", async (req, res) => {
+    const result = await transport.sendMail({
+        from: `Correo de prueba <${process.env.MAIL_USER}>`,
+        to: `${process.env.MAIL_USER}`,
+        subject: "Correo de prueba",
+        html: `<div>
+                <h1>CORREO TEST</h1>
+                <p>Correo sin adjunto</p>
+            </div>`,
+    });
+    res.send("Correo enviado");
+});
+app.get("/mail-adjunto", async (req, res) => {
+    const result = await transport.sendMail({
+        from: `Correo de prueba <${process.env.MAIL_USER}>`,
+        to: `${process.env.MAIL_USER}`,
+        subject: "Correo de prueba",
+        html: `<div>
+                <h1>CORREO TEST</h1>
+                <p>Correo con adjunto</p>
+            </div>`,
+        attachments: [
+        {
+            filename: "img1.jpg",
+            path: __dirname + "/public/img/img1.jpg",
+            cid: "img1",
+        },
+    ],
+    });
+    res.send("Correo enviado");
+});
+  
+//sms
+app.get("/sms", async (req, res) => {
+    const { message } = req.body;
+    const result = await client.messages.create({
+        body: "hola",
+        to: process.env.PHONE_NUMBER_TO, //cliente
+        from: process.env.PHONE_NUMBER, //numero de twilio
+    });
+res.send("Mensaje enviado");
+});
 // Middleware para manejar errores de autenticación de Passport 
 app.use((err, req, res, next) => { 
     if (err) { 
