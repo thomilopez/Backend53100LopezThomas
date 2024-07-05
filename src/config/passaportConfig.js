@@ -1,6 +1,6 @@
 import passport from "passport";
 import LocalStrategy from "passport-local";
-import userModel from "../persistencia/models/usersModel.js";
+import userModel from "../persistencia/models/usersDTO.js";
 import { createHash, isValidPassword } from "../utils.js";
 import GitHubStrategy from "passport-github";
 import jwt from "passport-jwt";
@@ -73,14 +73,14 @@ const initializePassport = () => {
             {
                 clientID: "Iv23lio7O397p8vdBPXu",
                 clientSecret: "f4d92c1eba940055b887e56774f6ea5b473ea066",
-                callbackURL: "http://localhost:3000/api/sessions/githubcallback",
+                callbackURL: "http://localhost:8080/api/sessions/githubcallback",
             },
             async (accessToken, refreshToken, profile, done) => {
                 try {
+
                     console.log(profile);
                     const user = await userModel.findOne({
-                        email: profile._json.email,
-                    });
+                        email: profile._json.email});
                     if (!user) {
                         const newUser = {
                         first_name: profile._json.name,
@@ -136,10 +136,14 @@ const initializePassport = () => {
     });
 
     passport.deserializeUser((id, done) => {
-        userModel.findById(id, (err, user) => {
-            done(err, user);
+        userModel.findById(id)
+            .then(user => {
+                done(null, user);
+            })
+            .catch(err => {
+                done(err, null);
+            });
         });
-    });
 };
 
 export default initializePassport;

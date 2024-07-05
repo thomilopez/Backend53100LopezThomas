@@ -22,15 +22,21 @@ import nodemailer from 'nodemailer'
 import twilio from 'twilio';
 import MongoSingleton from './persistencia/mongoSingleton.js';
 
-const app = express(); 
-const PORT = entorno.port
-const fileStorage = FileStore(session); 
+const productManager = new ProductManagerNew(); 
+const DB_URL2 = entorno.mongoURL 
+// Crear aplicación Express
+const app = express();
+const PORT = entorno.port;
+
+// const fileStorage = FileStore(session); 
+
+ // Configuración de socket.io
 const server = app.listen(PORT, () => { 
     console.log(`Servidor en ejecución en http://localhost:${PORT}`);
 }); 
 const io = new Server(server); 
-const productManager = new ProductManagerNew(); 
-const DB_URL2 = entorno.mongoURL 
+
+// Middleware y configuraciones
 app.engine('handlebars',  handlebars.engine({ 
     layoutsDir: path.join(__dirname, 'views/layouts'), 
     defaultLayout: 'main', 
@@ -44,6 +50,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public'))); 
 app.use(express.json()); 
 app.use(cookieParser()); 
+
+ // Configuración de sesiones
 app.use( 
         session({ 
         store: MongoStore.create({ 
@@ -122,14 +130,19 @@ app.use((err, req, res, next) => {
         res.status(401).json({ error: 'Error de autenticación' }); 
     } 
 }); 
-//usando passport 
+// Inicializa y usa passport con sesiones
 initializePassport() 
-app.use(passport.initialize()) 
+app.use(passport.initialize()); 
+app.use(passport.session());
+
+// Rutas
 app.use('/', router); 
 app.use('/api/products', productsRouter); 
 app.use('/api/sessions', sessionRouter); 
 app.use('/api/carts', cartsRouter); 
 app.use('/chat', chatRouter); 
+
+// Configuración de socket.io
 io.on("connection", (socket) => { 
     console.log("Usuario conectado"); 
     socket.on("disconnect", () => { 

@@ -1,4 +1,4 @@
-import chatModel from "../models/messagess.js"
+import chatModel from "../../models/messagess.js"
 
 class MessagesDAO {
     async getAllMessages() {

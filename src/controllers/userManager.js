@@ -1,5 +1,5 @@
 import { createHash } from "../utils.js";
-import userModel from "../persistencia/models/usersModel.js";
+import userModel from "../persistencia/models/usersDTO.js";
 
 export default class UserManager {
     constructor() {

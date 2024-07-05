@@ -1,4 +1,4 @@
-import productModel from '../persistencia/models/products.js';
+import productModel from '../persistencia/models/productsDTO.js';
 
 export default class ProductManagerNew {
     constructor() {
