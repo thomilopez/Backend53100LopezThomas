@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import auth from "../middlewares/auth.js"
-
+import { generateMockingProducts } from '../utils.js';
 const router = Router();
 
 router.get("/register", (req, res) => {
@@ -29,6 +29,12 @@ router.get('/realtimeproducts', (req, res) => {
 router.get('/chat', (req, res) => {
     res.render('chat'); 
 });
+
+router.get("/mockingproduct", async (req, res) => {
+    let products = generateMockingProducts();
+    res.send({ status: "success", payload: products });
+  });
+
 
 export default router;
 

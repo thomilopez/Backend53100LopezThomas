@@ -21,6 +21,9 @@ import cors from 'cors'
 import nodemailer from 'nodemailer'
 import twilio from 'twilio';
 import MongoSingleton from './persistencia/mongoSingleton.js';
+import compression from 'express-compression';
+import errorHandler from './middlewares/errorHandler.js';
+
 
 const productManager = new ProductManagerNew(); 
 const DB_URL2 = entorno.mongoURL 
@@ -37,6 +40,7 @@ const server = app.listen(PORT, () => {
 const io = new Server(server); 
 
 // Middleware y configuraciones
+app.use(compression())
 app.engine('handlebars',  handlebars.engine({ 
     layoutsDir: path.join(__dirname, 'views/layouts'), 
     defaultLayout: 'main', 
@@ -50,7 +54,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public'))); 
 app.use(express.json()); 
 app.use(cookieParser()); 
-
+app.use(errorHandler);
  // Configuración de sesiones
 app.use( 
         session({ 

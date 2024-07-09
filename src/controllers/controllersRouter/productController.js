@@ -1,8 +1,10 @@
 import ProductManagerNew from '../productManagerNew.js';
+import { CustomError, errorTypes } from "../../utils.js";
+
 
 const productManager = new ProductManagerNew();
 
-export const getProductsPaginated = async (req, res) => {
+export const getProductsPaginated = async (req, res, next) => {
     const { page = 1, limit = 10, sort, query } = req.query;
     try {
         const options = {
@@ -25,11 +27,11 @@ export const getProductsPaginated = async (req, res) => {
             nextLink: result.hasNextPage ? `/api/products?page=${result.nextPage}&limit=${limit}&sort=${sort}&query=${query}` : null
         });
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener los productos paginados.' });
+        next(CustomError.createCustomError('ProductPaginationError', 'Error al obtener los productos paginados.', errorTypes.ERROR_INTERNAL_ERROR));
     }
 };
 
-export const getProductById = async (req, res) => {
+export const getProductById = async (req, res, next) => {
     try {
         const productId = req.params.pid;
         const products = await ProductManagerNew.getAll();
@@ -37,40 +39,40 @@ export const getProductById = async (req, res) => {
         if (product) {
             res.json(product);
         } else {
-            res.status(404).json({ error: 'Producto no encontrado.' });
+            throw CustomError.createCustomError('ProductNotFoundError', 'Producto no encontrado.', errorTypes.ERROR_NOT_FOUND);
         }
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener el producto.' });
+        next(error);
     }
 };
 
-export const addProduct = async (req, res) => {
+export const addProduct = async (req, res, next) => {
     try {
         const newProduct = req.body;
         await productManager.addProduct(newProduct);
         res.json({ message: 'Producto agregado exitosamente.', newProduct });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        next(CustomError.createCustomError('ProductCreationError', error.message, errorTypes.ERROR_INVALID_ARGUMENTS));
     }
 };
 
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res, next) => {
     try {
         const productId = req.params.pid;
         const updatedFields = req.body;
         await productManager.updateProduct(productId, updatedFields);
         res.json({ message: 'Producto actualizado exitosamente.', updatedFields });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        next(CustomError.createCustomError('ProductUpdateError', error.message, errorTypes.ERROR_DATA));
     }
 };
 
-export const deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res, next) => {
     try {
         const productId = parseInt(req.params.pid);
         await ProductManagerNew.deleteProduct(productId);
         res.json({ message: 'Producto eliminado exitosamente.' });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        next(CustomError.createCustomError('ProductDeletionError', error.message, errorTypes.ERROR_DATA));
     }
 };
