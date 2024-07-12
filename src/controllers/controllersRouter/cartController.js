@@ -16,6 +16,7 @@ export const deleteProductFromCart = async (req, res, next) => {
         await cartManager.deleteProduct(cid, pid);
         res.json({ message: 'Producto eliminado del carrito exitosamente.' });
     } catch (error) {
+        logger.error(`Error en eliminar producto del carrito: ${error.message}`);
         next(CustomError.createCustomError('CartNotFoundError', error.message, errorTypes.ERROR_NOT_FOUND));
     }
 };
@@ -27,6 +28,7 @@ export const updateCart = async (req, res, next) => {
         await cartManager.updateCart(cid, products);
         res.json({ message: 'Carrito actualizado exitosamente.' });
     } catch (error) {
+        logger.error(`Error en actualizar el carrito: ${error.message}`);
         next(CustomError.createCustomError('CartUpdateError', error.message, errorTypes.ERROR_DATA));
     }
 };
@@ -41,6 +43,7 @@ export const updateProductQuantity = async (req, res, next) => {
         await cartManager.updateProductQuantity(cid, pid, quantity);
         res.json({ message: 'Cantidad de producto actualizada exitosamente.' });
     } catch (error) {
+        logger.error(`Error en actualizar la cantidad del producto: ${error.message}`);
         next(error);
     }
 };
@@ -52,6 +55,7 @@ export const deleteAllProducts = async (req, res, next) => {
         await cartManager.deleteAllProducts(cid);
         res.json({ message: 'Todos los productos del carrito han sido eliminados.' });
     } catch (error) {
+        logger.error(`Error en eliminar los productos: ${error.message}`);
         next(CustomError.createCustomError('CartNotFoundError', error.message, errorTypes.ERROR_NOT_FOUND));
     }
 };
@@ -62,6 +66,7 @@ export const createCart = async (req, res, next) => {
         io.emit('cartCreated', newCart);
         res.json(newCart);
     } catch (error) {
+        logger.error(`Error en crear carrito: ${error.message}`);
         next(CustomError.createCustomError('CartCreationError', error.message, errorTypes.ERROR_INTERNAL_ERROR));
     }
 };
@@ -75,6 +80,7 @@ export const getCartById = async (req, res, next) => {
         }
         res.json(cart);
     } catch (error) {
+        logger.error(`Error en obtener el carrito por ID: ${error.message}`);
         next(error);
     }
 };
@@ -87,6 +93,7 @@ export const addProductToCart = async (req, res, next) => {
         await cartManager.addProductToCart(cartId, productId, quantity);
         res.json({ message: 'Producto agregado al carrito exitosamente.' });
     } catch (error) {
+        logger.error(`Error en agregar el producto: ${error.message}`);
         next(CustomError.createCustomError('CartAdditionError', error.message, errorTypes.ERROR_DATA));
     }
 };
@@ -134,6 +141,7 @@ export const purchaseCart = async (req, res, next) => {
             cart: updatedCart
         });
     } catch (error) {
+        logger.error(`Error purchasing cart: ${error.message}`);
         next(CustomError.createCustomError('PurchaseError', error.message, errorTypes.ERROR_INTERNAL_ERROR));
     }
 };

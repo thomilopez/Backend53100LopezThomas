@@ -1,17 +1,17 @@
 import UserManager from "../userManager.js";
 import AuthManager from "../authManager.js";
-
+import { CustomError, errorTypes } from "../../utils.js";
 
 const userManager = new UserManager();
 const authManager = new AuthManager();
 
 export const getAllUsers = async (req, res) => {
     try {
-        const users = await userManager.getAll();
+        const users = await userManager.getAllUsers();
         res.status(200).json({ users });
     } catch (error) {
-        console.error(`Error al cargar los usuarios: ${error}`);
-        res.status(500).json({ error: `Error al recibir los usuarios` });
+        logger.error(`Error getting all users: ${error.message}`);
+        next(CustomError.createCustomError('UserRetrievalError', error.message, errorTypes.ERROR_INTERNAL_ERROR));
     }
 };
 
@@ -25,7 +25,7 @@ export const getUserById = async (req, res) => {
             res.status(404).json({ error: `Usuario con id: ${id} no encontrado` });
         }
     } catch (error) {
-        console.error(`Error al cargar el usuario: ${error}`);
+        logger.error(`Error getting user by ID: ${error.message}`);
         res.status(500).json({ error: `Error al recibir el usuario` });
     }
 };
@@ -36,7 +36,7 @@ export const createUser = async (req, res) => {
         const result = await userManager.createUser(newUser);
         res.status(201).json({ result });
     } catch (error) {
-        console.error(`Error al crear el usuario: ${error}`);
+        logger.error(`Error creating user: ${error.message}`);
         res.status(500).json({ error: `Error al crear el usuario` });
     }
 };

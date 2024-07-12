@@ -30,12 +30,7 @@ router.post("/logout", logoutUser);
 // Ruta para obtener la información del usuario actual
 router.get('/current', passport.authenticate('jwt', { session: false }), getCurrentUser); 
 
-// router.get("/mockingproduct", async (req, res) => {
-//     const products = generateMockingProducts();
-//     res.render("mockingproduct", {
-//         products,
-//     });
-// });
+
 
 
 export default router;

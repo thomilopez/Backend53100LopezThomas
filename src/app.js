@@ -23,6 +23,7 @@ import twilio from 'twilio';
 import MongoSingleton from './persistencia/mongoSingleton.js';
 import compression from 'express-compression';
 import errorHandler from './middlewares/errorHandler.js';
+import { addLogger } from './middlewares/logger.js';
 
 
 const productManager = new ProductManagerNew(); 
@@ -140,6 +141,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Rutas
+app.use(addLogger);
 app.use('/', router); 
 app.use('/api/products', productsRouter); 
 app.use('/api/sessions', sessionRouter); 
@@ -148,17 +150,17 @@ app.use('/chat', chatRouter);
 
 // Configuración de socket.io
 io.on("connection", (socket) => { 
-    console.log("Usuario conectado"); 
+    logger.info("Usuario conectado"); 
     socket.on("disconnect", () => { 
-        console.log("Usuario desconectado"); 
+        logger.info("Usuario conectado");
     }); 
 	socket.on('addProduct', async (product) => { 
         try { 
         const productAdded = await productManager.addProduct(product) 
-        console.log('Nuevo producto recibido:', product);    
+        logger.info('Nuevo producto recibido:', product);    
         io.emit('addToTheList', productAdded) 
         } catch (error) { 
-            console.error(error.message) 
+            logger.error(error.message);
         } 
     }) 
     socket.on('newMessage', (data) => { 

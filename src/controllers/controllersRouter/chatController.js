@@ -8,6 +8,7 @@ export const getAllMessages = async (req, res) => {
         const messages = await chatManager.getAllMessages();
         res.json(messages);
     } catch (error) {
+        logger.error(`Error en obtener los mensajes: ${error.message}`);
         res.status(500).json({ error: 'Error al obtener los mensajes del chat.' });
     }
 };
@@ -19,6 +20,7 @@ export const saveMessage = async (req, res) => {
         io.emit('newMessage', newMessage);
         res.json({ message: 'Mensaje guardado exitosamente.' });
     } catch (error) {
+        logger.error(`Error en guardar el mensaje: ${error.message}`);
         res.status(400).json({ error: 'Error al guardar el mensaje.' });
     }
 };
