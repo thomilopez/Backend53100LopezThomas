@@ -7,18 +7,18 @@ import cartsRouter from './routes/cartsRouter.js';
 import chatRouter from './routes/chatRouter.js';
 import router from './routes/viewsRouter.js';
 import __dirname from './utils.js';
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 import ProductManagerNew from './controllers/productManagerNew.js';
 import MongoStore from 'connect-mongo';
 import session from 'express-session';
-import FileStore from 'session-file-store';
+// import FileStore from 'session-file-store';
 import sessionRouter from './routes/sessions.router.js';
 import passport from 'passport';
 import initializePassport from './config/passaportConfig.js';
 import cookieParser from 'cookie-parser';
 import { entorno } from './config/config.js';
-import cors from 'cors'
-import nodemailer from 'nodemailer'
+import cors from 'cors';
+import nodemailer from 'nodemailer';
 import twilio from 'twilio';
 import MongoSingleton from './persistencia/mongoSingleton.js';
 import compression from 'express-compression';
@@ -32,7 +32,7 @@ const DB_URL2 = entorno.mongoURL
 const app = express();
 const PORT = entorno.port;
 
-// const fileStorage = FileStore(session); 
+
 
  // Configuración de socket.io
 const server = app.listen(PORT, () => { 
@@ -70,6 +70,12 @@ app.use(
     ); 
 
 MongoSingleton.getInstance();
+
+// Inicializa y usa passport con sesiones
+initializePassport() 
+app.use(passport.initialize()); 
+app.use(passport.session());
+
 //twilio
 const client = twilio(process.env.TWILIO_SSID, process.env.AUTH_TOKEN);
 //nodemailer
@@ -135,10 +141,6 @@ app.use((err, req, res, next) => {
         res.status(401).json({ error: 'Error de autenticación' }); 
     } 
 }); 
-// Inicializa y usa passport con sesiones
-initializePassport() 
-app.use(passport.initialize()); 
-app.use(passport.session());
 
 // Rutas
 app.use(addLogger);

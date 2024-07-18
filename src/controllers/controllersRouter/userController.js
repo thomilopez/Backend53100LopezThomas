@@ -108,3 +108,21 @@ export const getCurrentUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
     //lógica a implementar
 };
+
+export const changeUserRole = async (req, res) => {
+    try {
+        const { uid } = req.params;
+        const user = await userManager.getUserById(uid);
+        if (!user) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+        const newRole = user.rol === 'user' ? 'premium' : 'user';
+        user.rol = newRole;
+        await user.save();
+        res.status(200).json({ message: `Rol del usuario cambiado a ${newRole}` });
+    } catch (error) {
+        console.error(`Error al cambiar el rol del usuario: ${error}`);
+        res.status(500).json({ error: 'Error al cambiar el rol del usuario' });
+    }
+};
+

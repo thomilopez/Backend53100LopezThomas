@@ -39,9 +39,11 @@ const schema = new mongoose.Schema({
         },
         rol: {
             type: String,
-            enum: ['admin', 'user'],
+            enum: ['admin', 'user', 'premium'],
             default: "user",
         },
+        resetPasswordToken: String,
+        resetPasswordExpires: Date,
 })
 schema.plugin(mongoosePaginate);
 

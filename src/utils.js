@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { entorno } from './config/config.js';
 import mongoose from 'mongoose';
 import {fakerDE as faker } from '@faker-js/faker';
+import nodemailer from 'nodemailer';
 
 const JWT_SECRET = entorno.secretJWT
 
@@ -70,6 +71,29 @@ export const errorDictionary = {
     InvalidProductQuantityError: "Invalid product quantity.",
     CartNotFoundError: "Cart not found.",
 };
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: "smtp.gmail.com",
+    secure: false,
+    port: 587,
+    auth: {
+        user: entorno.MAIL_USER,
+        pass: entorno.MAIL_PASS
+    }
+});
+
+export const sendEmail = async (to, subject, html) => {
+    const mailOptions = {
+        from: entorno.MAIL_USER,
+        to,
+        subject,
+        html
+    };
+    return transporter.sendMail(mailOptions);
+};
+
+
 
 
 export default __dirname;

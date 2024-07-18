@@ -1,4 +1,6 @@
 import productModel from '../persistencia/models/productsDTO.js';
+import userModel from '../persistencia/models/usersDTO.js';
+
 
 export default class ProductManagerNew {
     constructor() {
@@ -35,14 +37,12 @@ export default class ProductManagerNew {
         }
     }
 
-    addProduct = async (product) => {
-        try {
-            let result = await productModel.create(product);
-            return result;
-        } catch (error) {
-            console.error("Error al agregar un nuevo producto:", error);
-            throw new Error("No se pudo agregar el producto");
+    addProduct = async (productData, user) => {
+        if (user.rol !== 'premium') {
+            throw new Error('Solo los usuarios premium pueden crear productos');
         }
+        productData.owner = user.email;
+        return await productModel.create(productData);
     }
 
     updateProduct = async (id, productData) => {
@@ -55,13 +55,14 @@ export default class ProductManagerNew {
         }
     }
 
-    deleteProduct = async (id) => {
-        try {
-            let result = await productModel.deleteOne({ _id: id });
-            return result;
-        } catch (error) {
-            console.error("Error al eliminar el producto:", error);
-            throw new Error("No se pudo eliminar el producto");
+    deleteProduct = async (productId, user) => {
+        const product = await productModel.findById(productId);
+        if (!product) {
+            throw new Error('Producto no encontrado');
         }
+        if (user.rol !== 'admin' && product.owner !== user.email) {
+            throw new Error('No tiene permisos para eliminar este producto');
+        }
+        return await productModel.findByIdAndDelete(productId);
     }
 }

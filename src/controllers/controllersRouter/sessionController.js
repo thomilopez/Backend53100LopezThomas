@@ -1,6 +1,8 @@
 import userModel from "../../persistencia/models/usersDTO.js";
 import { createHash, isValidPassword } from "../../utils.js";
+import AuthManager from "../authManager.js";
 
+const authManager = new AuthManager();
 
 export const getCurrentSession = (req, res) => {
     res.json(req.user);
@@ -59,4 +61,24 @@ export const restorePassword = async (req, res) => {
     await userModel.updateOne({ _id: user._id }, { $set: { password: newPass } });
     req.logger.info("Contraseña actualizada exitosamente");
     res.send({ status: "success", message: "Contraseña actualizada" });
+};
+
+export const sendResetEmail = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const result = await authManager.sendResetEmail(email);
+        res.send({ message: result });
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    const { token, newPassword } = req.body;
+    try {
+        const result = await authManager.resetPassword(token, newPassword);
+        res.send({ message: result });
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
 };

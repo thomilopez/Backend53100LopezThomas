@@ -44,7 +44,11 @@ const schema = new Schema({
         type: Boolean,
         required: true
     },
-
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users', 
+        default: null
+    }
 
 })
 

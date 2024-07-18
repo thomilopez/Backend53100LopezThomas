@@ -1,9 +1,9 @@
 import { Router } from "express";
 import passport from "passport";
-import { getCurrentSession, registerUser, failRegister, loginUser, failLogin, restorePassword } from "../controllers/controllersRouter/sessionController.js";
+import { getCurrentSession, registerUser, failRegister, loginUser, failLogin, restorePassword, sendResetEmail, resetPassword } from "../controllers/controllersRouter/sessionController.js";
+
 
 const sessionRouter = Router();
-
 
 
 sessionRouter.get("/current", passport.authenticate("jwt", { session: false }), getCurrentSession);
@@ -23,6 +23,9 @@ sessionRouter.get(
     }
 );
 sessionRouter.post("/restore", restorePassword);
+
+sessionRouter.post('/send-reset-email', sendResetEmail);
+sessionRouter.post('/reset-password', resetPassword);
 
 
 export default sessionRouter;

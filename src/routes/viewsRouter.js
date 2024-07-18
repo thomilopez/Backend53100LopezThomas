@@ -1,7 +1,12 @@
 import { Router } from 'express';
-import auth from "../middlewares/auth.js"
-import { generateMockingProducts } from '../utils.js';
+import auth from "../middlewares/auth.js";
+import { generateMockingProducts} from '../utils.js';
+import AuthManager from '../controllers/authManager.js';
+
+const authManager = new AuthManager();
 const router = Router();
+
+
 
 router.get("/register", (req, res) => {
     res.render("register");
@@ -46,6 +51,62 @@ router.get('/loggertest', (req, res) =>{
     
     res.send("Logs enviados con éxito");
 })
+
+// Ruta para mostrar la vista de solicitud de restablecimiento de contraseña
+router.get('/request-password-reset', (req, res) => {
+    res.render('requestPasswordReset');
+});
+
+// Ruta para enviar el correo de restablecimiento de contraseña
+router.post('/request-password-reset', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const result = await authManager.sendResetEmail(email);
+
+        if (result === "Correo de restablecimiento enviado") {
+            res.render('requestPasswordResetSuccess');
+        } else {
+            res.render('requestPasswordResetError', { error: result });
+        }
+    } catch (error) {
+        console.error('Error al enviar el correo de restablecimiento de contraseña:', error);
+        res.status(500).send('Error interno al procesar la solicitud');
+    }
+});
+
+// Ruta para mostrar la vista de restablecimiento de contraseña
+router.get('/reset-password', async (req, res) => {
+    try {
+        const token = req.query.token;
+        const isValidToken = await authManager.validateResetToken(token);
+
+        if (!isValidToken) {
+            return res.render('resetPasswordExpired');
+        }
+
+        res.render('resetPasswordForm', { token });
+    } catch (error) {
+        console.error('Error al procesar el token de restablecimiento:', error);
+        res.status(500).send('Error interno al procesar la solicitud');
+    }
+});
+
+// Ruta para procesar el formulario de restablecimiento de contraseña
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+        const result = await authManager.resetPassword(token, newPassword);
+
+        if (result === "Contraseña restablecida exitosamente") {
+            return res.render('resetPasswordSuccess');
+        } else {
+            return res.render('resetPasswordError', { error: result });
+        }
+    } catch (error) {
+        console.error('Error al procesar el restablecimiento de contraseña:', error);
+        res.status(500).send('Error interno al procesar la solicitud');
+    }
+});
 
 export default router;
 

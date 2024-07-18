@@ -1,5 +1,5 @@
 import cartModel from '../persistencia/models/cartsDTO.js'
-
+import productModel from '../persistencia/models/productsDTO.js'
 
 export default class CartManagerNew {
     
@@ -20,12 +20,18 @@ export default class CartManagerNew {
         return result
     }
     
-    addProductToCart = async (cid, pid, quantity) => {
+    addProductToCart = async (cid, pid, quantity, user) => {
         try {
             let cart = await cartModel.findById(cid);
-            let product = cart.products.find((product) => product.product.toString() === pid);
-            if (product) {
-                product.quantity += quantity;
+            let product = await productModel.findById(pid);
+
+            if (user.rol === 'premium' && product.owner === user.email) {
+                throw new Error('No puedes agregar tu propio producto al carrito');
+            }
+
+            let cartProduct = cart.products.find((product) => product.product.toString() === pid);
+            if (cartProduct) {
+                cartProduct.quantity += quantity;
             } else {
                 cart.products.push({ product: pid, quantity });
             }
