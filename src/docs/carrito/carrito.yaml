@@ -1,0 +1,283 @@
+info:
+  title: API de Carrito de Compras
+  description: Documentación de la API para gestionar carritos de compras.
+
+paths:
+  /api/carts:
+    get:
+      summary: Obtener el carrito del usuario autenticado
+      security:
+        - bearerAuth: []
+      tags:
+        - Carritos
+      responses:
+        '200':
+          description: Carrito obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                            price:
+                              type: number
+                        quantity:
+                          type: number
+        '401':
+          description: Usuario no autenticado
+        '404':
+          description: Carrito no encontrado
+        '500':
+          description: Error al obtener el carrito
+
+  /api/carts/new:
+    post:
+      summary: Crear un nuevo carrito
+      security:
+        - bearerAuth: []
+      tags:
+        - Carritos
+      responses:
+        '200':
+          description: Carrito creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          description: Usuario no autenticado
+        '500':
+          description: Error al crear el carrito
+
+  /api/carts/{cid}:
+    get:
+      summary: Obtener un carrito por su ID
+      security:
+        - bearerAuth: []
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Carrito obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          description: Usuario no autenticado
+        '404':
+          description: Carrito no encontrado
+        '500':
+          description: Error al obtener el carrito
+
+    patch:
+      summary: Actualizar el carrito
+      security:
+        - bearerAuth: []
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productId:
+                        type: string
+                      quantity:
+                        type: number
+      responses:
+        '200':
+          description: Carrito actualizado exitosamente
+        '401':
+          description: Usuario no autenticado
+        '404':
+          description: Carrito no encontrado
+        '500':
+          description: Error al actualizar el carrito
+
+    delete:
+      summary: Eliminar todos los productos del carrito
+      security:
+        - bearerAuth: []
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Todos los productos del carrito han sido eliminados
+        '401':
+          description: Usuario no autenticado
+        '404':
+          description: Carrito no encontrado
+        '500':
+          description: Error al eliminar todos los productos del carrito
+
+  /api/carts/{cid}/products/{pid}:
+    delete:
+      summary: Eliminar un producto del carrito
+      security:
+        - bearerAuth: []
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto eliminado del carrito exitosamente
+        '401':
+          description: Usuario no autenticado
+        '404':
+          description: Carrito o producto no encontrado
+        '500':
+          description: Error al eliminar el producto del carrito
+
+    patch:
+      summary: Actualizar la cantidad de un producto en el carrito
+      security:
+        - bearerAuth: []
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: number
+      responses:
+        '200':
+          description: Cantidad de producto actualizada exitosamente
+        '401':
+          description: Usuario no autenticado
+        '404':
+          description: Carrito o producto no encontrado
+        '500':
+          description: Error al actualizar la cantidad del producto
+
+  /api/carts/{cid}/purchase:
+    post:
+      summary: Realizar la compra del carrito
+      security:
+        - bearerAuth: []
+      tags:
+        - Carritos
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: ID del carrito
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Compra realizada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ticket:
+                    $ref: '#/components/schemas/Ticket'
+                  unprocessedProducts:
+                    type: array
+                    items:
+                      type: string
+                  cart:
+                    $ref: '#/components/schemas/Cart'
+        '401':
+          description: Usuario no autenticado
+        '404':
+          description: Carrito no encontrado
+        '500':
+          description: Error al realizar la compra
+
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: string
+        userId:
+          type: string
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+              quantity:
+                type: number
+
+    Ticket:
+      type: object
+      properties:
+        _id:
+          type: string
+        amount:
+          type: number
+        purchaser:
+          type: string

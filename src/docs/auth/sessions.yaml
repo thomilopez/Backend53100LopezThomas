@@ -1,0 +1,221 @@
+info:
+  title: API de sessions
+  description: Documentación de Endpoints para la gestión de sesiones de usuario
+
+paths:
+  /current:
+    get:
+      summary: Obtener la sesión actual del usuario
+      tags: [Sessions]
+      security:
+        - jwt: []
+      responses:
+        200:
+          description: Sesión actual del usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        401:
+          description: No autorizado
+
+  /register:
+    post:
+      summary: Registrar un nuevo usuario
+      tags: [Sessions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        201:
+          description: Usuario registrado exitosamente
+        400:
+          description: Error en el registro
+
+  /login:
+    post:
+      summary: Iniciar sesión de usuario
+      tags: [Sessions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        200:
+          description: Inicio de sesión exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      rol:
+                        type: string
+                  token:
+                    type: string
+        400:
+          description: Error en el login
+
+  /restore:
+    post:
+      summary: Restaurar contraseña del usuario
+      tags: [Sessions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        200:
+          description: Contraseña restaurada exitosamente
+        400:
+          description: Error al restaurar contraseña
+
+  /send-reset-email:
+    post:
+      summary: Enviar correo de restablecimiento de contraseña
+      tags: [Sessions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        200:
+          description: Correo de restablecimiento enviado
+        400:
+          description: Error al enviar correo de restablecimiento
+
+  /reset-password:
+    post:
+      summary: Restablecer la contraseña usando el token
+      tags: [Sessions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        200:
+          description: Contraseña restablecida exitosamente
+        400:
+          description: Error al restablecer la contraseña
+
+  /github:
+    get:
+      summary: Iniciar sesión con GitHub
+      tags: [Sessions]
+      responses:
+        302:
+          description: Redirigido a GitHub para autenticación
+
+  /githubcallback:
+    get:
+      summary: Callback de autenticación de GitHub
+      tags: [Sessions]
+      responses:
+        302:
+          description: Redirigido después de autenticación exitosa
+
+  /failregister:
+    get:
+      summary: Fallo en el registro
+      tags: [Sessions]
+      responses:
+        400:
+          description: Fallo en el registro
+
+  /faillogin:
+    get:
+      summary: Fallo en el login
+      tags: [Sessions]
+      responses:
+        400:
+          description: Fallo en el login
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+        - password
+        - age
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        age:
+          type: integer
+        rol:
+          type: string
+          enum: [admin, user, premium]
+        resetPasswordToken:
+          type: string
+        resetPasswordExpires:
+          type: string
+          format: date-time
+        documents:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              reference:
+                type: string
+        last_connection:
+          type: string
+          format: date-time
+
+securitySchemes:
+  jwt:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT

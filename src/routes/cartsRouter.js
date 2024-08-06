@@ -1,40 +1,94 @@
-import express from 'express';
+import express from 'express'
 import {
-    deleteProductFromCart,
-    updateCart,
-    updateProductQuantity,
-    deleteAllProducts,
-    createCart,
-    getCartById,
-    addProductToCart,
-    purchaseCart,
-} from "../controllers/controllersRouter/cartController.js"
-import AuthorizationMiddleware from '../middlewares/authorizationMiddleware.js';
+	deleteProductFromCart,
+	updateCart,
+	updateProductQuantity,
+	deleteAllProducts,
+	createCart,
+	getCartById,
+	addProductToCart,
+	purchaseCart,
+	addProductToCartB,
+	getCart,
+} from '../controllers/controllersRouter/cartController.js'
+import AuthorizationMiddleware from '../middlewares/authorizationMiddleware.js'
+import { authenticate } from '../middlewares/authMiddleware.js'
 
-const cartsRouter = express.Router();
+const cartsRouter = express.Router()
 
 // Ruta para eliminar un producto del carrito
-cartsRouter.delete('/:cid/products/:pid', AuthorizationMiddleware.isUser, deleteProductFromCart);
+cartsRouter.delete(
+	'/:cid/products/:pid',
+	authenticate,
+	AuthorizationMiddleware.isUser,
+	deleteProductFromCart,
+)
 
 // Ruta para actualizar el carrito
-cartsRouter.put('/:cid', AuthorizationMiddleware.isUser, updateCart);
+cartsRouter.patch(
+	'/:cid',
+	authenticate,
+	AuthorizationMiddleware.isUser,
+	updateCart,
+)
 
 // Ruta para actualizar la cantidad de un producto en el carrito
-cartsRouter.put('/:cid/products/:pid', AuthorizationMiddleware.isUser, updateProductQuantity);
+cartsRouter.patch(
+	'/:cid/products/:pid',
+	authenticate,
+	AuthorizationMiddleware.isUser,
+	updateProductQuantity,
+)
 
 // Ruta para eliminar todos los productos del carrito
-cartsRouter.delete('/:cid', AuthorizationMiddleware.isUser, deleteAllProducts);
+cartsRouter.delete(
+	'/:cid',
+	authenticate,
+	AuthorizationMiddleware.isUser,
+	deleteAllProducts,
+)
+
+cartsRouter.get('/', authenticate, AuthorizationMiddleware.isUser, getCart)
 
 // Ruta para crear un nuevo carrito
-cartsRouter.post('/', AuthorizationMiddleware.isUser, createCart);
+cartsRouter.post(
+	'/new',
+	authenticate,
+	AuthorizationMiddleware.isUser,
+	createCart,
+)
 
 // Ruta para obtener un carrito por su ID
-cartsRouter.get('/:cid', AuthorizationMiddleware.isUser, getCartById);
+cartsRouter.get(
+	'/:cid',
+	authenticate,
+	AuthorizationMiddleware.isUser,
+	getCartById,
+)
 
 // Ruta para agregar un producto al carrito
-cartsRouter.post('/:cid/product/:pid', AuthorizationMiddleware.isUser, addProductToCart);
+cartsRouter.post(
+	'/:cid/product/:pid',
+	authenticate,
+	AuthorizationMiddleware.isUser,
+	addProductToCart,
+)
 
+// Ruta para agregar un producto al carrito por front
+cartsRouter.post(
+	'/add/:id',
+	authenticate,
+	AuthorizationMiddleware.isUser,
+	addProductToCartB,
+)
 
-cartsRouter.post('/:cid/purchase', AuthorizationMiddleware.isUser, purchaseCart);
+cartsRouter.post('/checkout', authenticate, purchaseCart)
 
-export default cartsRouter;
+cartsRouter.post(
+	'/:cid/purchase',
+	authenticate,
+	AuthorizationMiddleware.isUser,
+	purchaseCart,
+)
+
+export default cartsRouter

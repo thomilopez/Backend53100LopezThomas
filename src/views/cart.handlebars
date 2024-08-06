@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+</head>
+<body>
+    <h1>Carrito de Compras</h1>
+    <ul id="cartItems">
+    </ul>
+    <button onclick="checkout()">Proceder al Checkout</button>
+    
+    <script>
+        function getTokenFromCookies() {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('token='))
+                ?.split('=')[1];
+            return cookieValue || '';
+        }
+        document.addEventListener('DOMContentLoaded', async () => {
+            const response = await fetch('/api/carts', {
+                    headers: {
+                        'Authorization': `Bearer ${getTokenFromCookies()}`
+                    }
+            });
+
+            const data = await response.json();
+            const items = data.items;
+
+            const cartItems = document.getElementById('cartItems');
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = `${item.product.title} - ${item.quantity} - $${item.product.price}`;
+                cartItems.appendChild(li);
+            });
+        });
+
+        function checkout() {
+            window.location.href = '/checkout';
+        }
+    </script>
+</body>
+</html>

@@ -1,81 +1,92 @@
-import userModel from "../persistencia/models/usersDTO.js";
-import { isValidPassword, generateToken, sendEmail, createHash } from "../utils.js";
-import jwt  from 'jsonwebtoken';
-import { entorno } from "../config/config.js";
-
+import userModel from '../persistencia/models/usersDTO.js'
+import {
+	isValidPassword,
+	generateToken,
+	sendEmail,
+	createHash,
+} from '../utils.js'
+import jwt from 'jsonwebtoken'
+import { entorno } from '../config/config.js'
 
 export default class AuthManager {
-    constructor() {
-        console.log("Constructor AuthManager");
-    }
+	constructor() {
+		console.log('Constructor AuthManager')
+	}
 
-    async login({ email, password }) {
-    try {
-        const user = await userModel.findOne({ email });
-        if (!user) return "Usuario no encontrado";
-        const valid = isValidPassword(user, password);
-        if (!valid) return "Error de auteuticación";
-        const token = generateToken(email);
-        return { message: "Autenticacion exitosa", token };
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({ status: "error", massage: error.message });
-    }}
+	async login({ email, password }) {
+		try {
+			const user = await userModel.findOne({ email })
+			if (!user) return 'Usuario no encontrado'
+			const valid = isValidPassword(user, password)
+			if (!valid) return 'Error de auteuticación'
+			const token = generateToken(email)
 
-    async sendResetEmail(email) {
-        try {
-            const user = await userModel.findOne({ email });
-            if (!user) return "Usuario no encontrado";
+			user.last_connection = new Date()
+			await user.save()
 
-            const token = generateToken(email);
-            const resetLink = `http://localhost:8080/reset-password?token=${token}`;
+			return { message: 'Autenticacion exitosa', token }
+		} catch (error) {
+			res.status(500).send({ status: 'error', massage: error.message })
+		}
+	}
 
-            await sendEmail(user.email, 'Restablecimiento de contraseña', `Haga clic en <a href="${resetLink}">este enlace</a> para restablecer su contraseña.`);
+	async sendResetEmail(email) {
+		try {
+			const user = await userModel.findOne({ email })
+			if (!user) return 'Usuario no encontrado'
 
-            return "Correo de restablecimiento enviado";
-        } catch (error) {
-            console.log(error);
-            return { status: "error", message: error.message };
-        }
-    }
+			const token = generateToken(email)
+			const resetLink = `http://localhost:8080/reset-password?token=${token}`
 
-    async resetPassword(token, newPassword) {
-        try {
-            const decoded = jwt.verify(token, entorno.secretJWT);
-            const user = await userModel.findOne({ email: decoded.email });
+			await sendEmail(
+				user.email,
+				'Restablecimiento de contraseña',
+				`Haga clic en <a href="${resetLink}">este enlace</a> para restablecer su contraseña.`,
+			)
 
-            if (!user) return "Usuario no encontrado";
-            const isSamePassword = isValidPassword(user, newPassword);
-            if (isSamePassword) return "No se puede usar la misma contraseña";
+			return 'Correo de restablecimiento enviado'
+		} catch (error) {
+			console.error(`Error al enviar el correo de restablecimiento: ${error}`)
+			return { status: 'error', message: error.message }
+		}
+	}
 
-            user.password = createHash(newPassword);
-            await user.save();
+	async resetPassword(token, newPassword) {
+		try {
+			const decoded = jwt.verify(token, entorno.secretJWT)
+			const user = await userModel.findOne({ email: decoded.email })
 
-            return "Contraseña restablecida exitosamente";
-        } catch (error) {
-            console.log(error);
-            return { status: "error", message: error.message };
-        }
-    }
-    async validateResetToken(token) {
-        try {
-            const decoded = jwt.verify(token, entorno.secretJWT);
-            const user = await userModel.findOne({ email: decoded.email });
+			if (!user) return 'Usuario no encontrado'
+			const isSamePassword = isValidPassword(user, newPassword)
+			if (isSamePassword) return 'No se puede usar la misma contraseña'
 
-            if (!user) {
-                return false; // Usuario no encontrado
-            }
+			user.password = createHash(newPassword)
+			await user.save()
 
-            // Verificar si el token está expirado
-            const currentTimestamp = new Date().getTime() / 1000; // Tiempo actual en segundos
-            if (decoded.exp < currentTimestamp) {
-                return false; // Token expirado
-            }
+			return 'Contraseña restablecida exitosamente'
+		} catch (error) {
+			console.error(`Error al restablecer la contraseña: ${error}`)
+			return { status: 'error', message: error.message }
+		}
+	}
+	async validateResetToken(token) {
+		try {
+			const decoded = jwt.verify(token, entorno.secretJWT)
+			const user = await userModel.findOne({ email: decoded.email })
 
-            return true; // Token válido
-        } catch (error) {
-            console.error('Error al validar el token de restablecimiento:', error);
-            return false;
-        }
-    }
+			if (!user) {
+				return false
+			}
+
+			const currentTimestamp = new Date().getTime() / 1000 // Tiempo actual en segundos
+			if (decoded.exp < currentTimestamp) {
+				return false
+			}
+
+			return true // Token válido
+		} catch (error) {
+			console.error('Error al validar el token de restablecimiento:', error)
+			return false
+		}
+	}
 }

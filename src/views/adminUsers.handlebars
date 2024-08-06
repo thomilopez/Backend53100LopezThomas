@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Usuarios</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    
+</head>
+<body>
+    <h1>Administrar Usuarios</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each users}}
+            <tr>
+                <td>{{this.first_name}} {{this.last_name}}</td>
+                <td>{{this.email}}</td>
+                <td>{{this.rol}}</td>
+                <td>
+                    <button onclick="modifyUser({{this.id}})">Modificar Rol</button>
+                    <button onclick="deleteUser({{this.id}})">Eliminar</button>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+        <tbody id="userTableBody">
+        </tbody>
+    </table>
+    
+    <script>
+        function getTokenFromCookies() {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('token='))
+                ?.split('=')[1];
+            return cookieValue || '';
+        }
+
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const token = getTokenFromCookies();
+                const response = await fetch('/api/users', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`Error en la solicitud: ${response.statusText}`);
+                }
+                const data = await response.json();
+                const users = data.users;
+                console.log(users)
+                const tableBody = document.getElementById('userTableBody');
+                
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.first_name} ${user.last_name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.rol}</td>
+                        <td>
+                            <button onclick="modifyUser('${user.id}')">Modificar Rol</button>
+                            <button onclick="deleteUser('${user.id}')">Eliminar</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error al obtener los usuarios:', error);
+            }
+        });
+
+        async function modifyUser(id) {
+            try {
+                
+                const response = await fetch(`/api/users/premium/${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${getTokenFromCookies()}`
+                    }
+                });
+                const result = await response.json();
+                alert(result.message);
+                location.reload();
+            } catch (error) {
+                console.error('Error al modificar el usuario:', error);
+            }
+        }
+
+        
+        async function deleteUser(id) {
+            try {
+                const response = await fetch(`/api/user/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${getTokenFromCookies()}`
+                    }
+                });
+                const result = await response.json();
+                alert(result.message);
+                location.reload(); 
+            } catch (error) {
+                console.error('Error al eliminar el usuario:', error);
+            }
+        }
+    </script>
+</body>
+</html>

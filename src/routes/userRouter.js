@@ -1,39 +1,97 @@
-import { Router } from "express";
-import passport from "passport";
-import { getAllUsers, changeUserRole, getUserById, createUser, updateUser, deleteUser, loginUser, logoutUser, getCurrentUser } from "../controllers/controllersRouter/userController.js";
-import AuthorizationMiddleware from '../middlewares/authorizationMiddleware.js';
+import { Router } from 'express'
+import passport from 'passport'
+import {
+	getAllUsers,
+	changeUserRole,
+	getUserById,
+	createUser,
+	updateUser,
+	deleteUser,
+	loginUser,
+	logoutUser,
+	getCurrentUser,
+	updateToPremium,
+	uploadDocuments,
+	deleteInactiveUsers,
+} from '../controllers/controllersRouter/userController.js'
+import AuthorizationMiddleware from '../middlewares/authorizationMiddleware.js'
+import upload from '../middlewares/multerConfig.js'
 
-
-const router = Router();
+const userRouter = Router()
 
 // Ruta para obtener la lista de usuarios (solo accesible para administradores)
-router.get("/users", passport.authenticate('jwt', { session: false }), AuthorizationMiddleware.isAdmin, getAllUsers);
+userRouter.get(
+	'/users',
+	passport.authenticate('jwt', { session: false }),
+	AuthorizationMiddleware.isAdmin,
+	getAllUsers,
+)
+
+userRouter.delete(
+	'/',
+	passport.authenticate('jwt', { session: false }),
+	AuthorizationMiddleware.isAdmin,
+	deleteInactiveUsers,
+)
 
 // Ruta para obtener un usuario por su ID
-router.get("/user/:id", passport.authenticate('jwt', { session: false }), AuthorizationMiddleware.isUserOrAdmin, getUserById);
+userRouter.get(
+	'/user/:id',
+	passport.authenticate('jwt', { session: false }),
+	AuthorizationMiddleware.isUserOrAdmin,
+	getUserById,
+)
 
 // Ruta para crear un nuevo usuario
-router.post("/user", createUser);
+userRouter.post('/user', createUser)
 
 // Ruta para actualizar un usuario (solo accesible para el usuario o administradores)
-router.put("/user/:id", passport.authenticate('jwt', { session: false }), AuthorizationMiddleware.isUserOrAdmin, updateUser);
+userRouter.patch(
+	'/user/:id',
+	passport.authenticate('jwt', { session: false }),
+	AuthorizationMiddleware.isUserOrAdmin,
+	updateUser,
+)
 
 // Ruta para cambiar el rol de un usuario (solo accesible para administradores)
-router.put("/api/users/premium/:uid", passport.authenticate('jwt', { session: false }), AuthorizationMiddleware.isAdmin, changeUserRole);
+userRouter.patch(
+	'/users/premium/:id',
+	passport.authenticate('jwt', { session: false }),
+	AuthorizationMiddleware.isAdmin,
+	changeUserRole,
+)
+
+userRouter.patch('/user/:id/premium', updateToPremium)
+
+userRouter.post(
+	'/user/:id/documents',
+	upload.fields([
+		{ name: 'profileImage', maxCount: 1 },
+		{ name: 'productImage', maxCount: 1 },
+		{ name: 'document', maxCount: 10 },
+	]),
+	uploadDocuments,
+)
 
 // Ruta para eliminar un usuario (solo accesible para administradores)
-router.delete("/user/:id", passport.authenticate('jwt', { session: false }), AuthorizationMiddleware.isAdmin, deleteUser);
+userRouter.delete(
+	'/user/:id',
+	passport.authenticate('jwt', { session: false }),
+	AuthorizationMiddleware.isAdmin,
+	deleteUser,
+)
 
 // Ruta para iniciar sesión
-router.post("/login", loginUser);
+userRouter.post('/login', loginUser)
 
 // Ruta para cerrar sesión
-router.post("/logout", logoutUser);
+userRouter.post('/logout', logoutUser)
 
 // Ruta para obtener la información del usuario actual
-router.get('/current', passport.authenticate('jwt', { session: false }), getCurrentUser);
+userRouter.get(
+	'/current',
+	passport.authenticate('jwt', { session: false }),
+	getCurrentUser,
+)
 
-
-
-
-export default router;
+export default userRouter
