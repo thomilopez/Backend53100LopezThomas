@@ -1,5 +1,5 @@
 import userModel from '../../persistencia/models/usersDTO.js'
-import { createHash, isValidPassword } from '../../utils.js'
+import { createHash } from '../../utils.js'
 import AuthManager from '../authManager.js'
 import jwt from 'jsonwebtoken'
 
@@ -97,7 +97,11 @@ export const sendResetEmail = async (req, res) => {
 		const result = await authManager.sendResetEmail(email)
 		res.send({ message: result })
 	} catch (error) {
-		res.status(500).send({ error: error.message })
+		res
+			.status(500)
+			.json({
+				msg: `Error interno del servidor en sessionController.sendResetEmail: ${error}`,
+			})
 	}
 }
 
@@ -107,6 +111,10 @@ export const resetPassword = async (req, res) => {
 		const result = await authManager.resetPassword(token, newPassword)
 		res.send({ message: result })
 	} catch (error) {
-		res.status(500).send({ error: error.message })
+		res
+			.status(500)
+			.json({
+				msg: `Error interno del servidor en sessionController.resetPassword: ${error} `,
+			})
 	}
 }

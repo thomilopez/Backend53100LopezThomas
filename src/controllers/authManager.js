@@ -7,10 +7,11 @@ import {
 } from '../utils.js'
 import jwt from 'jsonwebtoken'
 import { entorno } from '../config/config.js'
+import logger from '../middlewares/logger.js'
 
 export default class AuthManager {
 	constructor() {
-		console.log('Constructor AuthManager')
+		logger.info('Constructor AuthManager')
 	}
 
 	async login({ email, password }) {
@@ -19,14 +20,16 @@ export default class AuthManager {
 			if (!user) return 'Usuario no encontrado'
 			const valid = isValidPassword(user, password)
 			if (!valid) return 'Error de auteuticación'
-			const token = generateToken(email)
+			const token = generateToken(user)
 
 			user.last_connection = new Date()
 			await user.save()
 
 			return { message: 'Autenticacion exitosa', token }
 		} catch (error) {
-			res.status(500).send({ status: 'error', massage: error.message })
+			res
+				.status(500)
+				.json({ msg: `Error interno del servidor en authManager.: ${error}` })
 		}
 	}
 
@@ -46,7 +49,7 @@ export default class AuthManager {
 
 			return 'Correo de restablecimiento enviado'
 		} catch (error) {
-			console.error(`Error al enviar el correo de restablecimiento: ${error}`)
+			logger.error(`Error al enviar el correo de restablecimiento: ${error}`)
 			return { status: 'error', message: error.message }
 		}
 	}
@@ -65,7 +68,7 @@ export default class AuthManager {
 
 			return 'Contraseña restablecida exitosamente'
 		} catch (error) {
-			console.error(`Error al restablecer la contraseña: ${error}`)
+			logger.error(`Error al restablecer la contraseña: ${error}`)
 			return { status: 'error', message: error.message }
 		}
 	}
@@ -85,7 +88,7 @@ export default class AuthManager {
 
 			return true // Token válido
 		} catch (error) {
-			console.error('Error al validar el token de restablecimiento:', error)
+			logger.error('Error al validar el token de restablecimiento:', error)
 			return false
 		}
 	}

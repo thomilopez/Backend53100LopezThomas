@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { entorno } from '../config/config.js'
+import logger from '../middlewares/logger.js'
 
 const url = entorno.mongoURL
 
@@ -10,11 +11,11 @@ export default new (class MongoSingleton {
 	}
 	getInstance() {
 		if (this.#instance) {
-			console.log('Ya estás conectado')
+			logger.info('Ya estás conectado')
 			return this.#instance
 		}
 		this.#instance = new MongoSingleton()
-		console.log('Conectado a la base de datos')
+		logger.info('Conectado a la base de datos')
 		return this.#instance
 	}
 })()

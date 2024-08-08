@@ -18,8 +18,10 @@ export const createHash = (password) =>
 export const isValidPassword = (user, password) => {
 	return bcrypt.compareSync(password, user.password)
 }
-export const generateToken = (email) => {
-	return jwt.sign({ email }, JWT_SECRET, { expiresIn: '1h' })
+export const generateToken = (user) => {
+	return jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
+		expiresIn: '1h',
+	})
 }
 export const generateUniqueCode = async () => {
 	const newObjectId = new mongoose.Types.ObjectId()

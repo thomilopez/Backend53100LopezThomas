@@ -23,6 +23,9 @@ export const deleteProductFromCart = async (req, res, next) => {
 				errorTypes.ERROR_NOT_FOUND,
 			),
 		)
+		res.status(500).json({
+			msg: `Error interno del servidor en cartController.deleteProductFromCart: ${error}`,
+		})
 	}
 }
 
@@ -41,6 +44,9 @@ export const updateCart = async (req, res, next) => {
 				errorTypes.ERROR_DATA,
 			),
 		)
+		res.status(500).json({
+			msg: `Error interno del servidor en cartController.updateCart: ${error}`,
+		})
 	}
 }
 
@@ -67,7 +73,10 @@ export const getCart = async (req, res) => {
 
 		res.json({ items })
 	} catch (error) {
-		res.status(500).json({ error: 'Error al obtener el carrito' })
+		logger.error(`Error al traer el carrito: ${error}`)
+		res.status(500).json({
+			msg: `Error interno del servidor en cartController.getCart: ${error}`,
+		})
 	}
 }
 
@@ -89,6 +98,9 @@ export const updateProductQuantity = async (req, res, next) => {
 			`Error en actualizar la cantidad del producto: ${error.message}`,
 		)
 		next(error)
+		res.status(500).json({
+			msg: `Error interno del servidor en cartController.updateProductQuantity: ${error}`,
+		})
 	}
 }
 
@@ -108,6 +120,9 @@ export const deleteAllProducts = async (req, res, next) => {
 				errorTypes.ERROR_NOT_FOUND,
 			),
 		)
+		res.status(500).json({
+			msg: `Error interno del servidor en cartController.deleteAllProducts: ${error}`,
+		})
 	}
 }
 
@@ -126,8 +141,12 @@ export const createCart = async (req, res, next) => {
 				errorTypes.ERROR_INTERNAL_ERROR,
 			),
 		)
+		res.status(500).json({
+			msg: `Error interno del servidor en cartController.createCart: ${error}`,
+		})
 	}
 }
+
 export const getCartById = async (req, res, next) => {
 	try {
 		const cartId = req.params.cid
@@ -143,6 +162,10 @@ export const getCartById = async (req, res, next) => {
 	} catch (error) {
 		logger.error(`Error en obtener el carrito por ID: ${error.message}`)
 		next(error)
+
+		res.status(500).json({
+			msg: `Error interno del servidor en cartController.getCartById: ${error}`,
+		})
 	}
 }
 
@@ -172,33 +195,64 @@ export const addProductToCart = async (req, res, next) => {
 				errorTypes.ERROR_DATA,
 			),
 		)
-	}
-}
-
-export const addProductToCartB = async (req, res) => {
-	const { id } = req.params
-	const { quantity } = req.body
-	const userId = req.user._id
-	try {
-		let cart = await cartManager.getCartByUserId(userId)
-		if (!cart) {
-			cart = await cartManager.createCart(userId)
-		}
-		const product = await cartManager.getProductById(id)
-		if (!product) {
-			return res
-				.status(404)
-				.json({ status: 'error', message: 'Producto no encontrado' })
-		}
-		await cartManager.addProductToCartB(cart._id, id, quantity)
-		res.json({ status: 'success', message: 'Producto agregado al carrito' })
-	} catch (error) {
 		res.status(500).json({
-			status: 'error',
-			message: 'Error al agregar el producto al carrito',
+			msg: `Error interno del servidor en cartController.addProductToCart: ${error}`,
 		})
 	}
 }
+
+// export const addProductToCartB = async (req, res) => {
+// 	const { id } = req.params
+// 	const { quantity } = req.body
+// 	const userId = req.user.id
+// 	try {
+// 		let cart = await cartManager.getCartByUserId(userId)
+// 		if (!cart) {
+// 			cart = await cartManager.createCart(userId)
+// 		}
+// 		const product = await cartManager.getProductById(id)
+// 		if (!product) {
+// 			return res
+// 				.status(404)
+// 				.json({ status: 'error', message: 'Producto no encontrado' })
+// 		}
+// 		await cartManager.addProductToCartB(cart._id, id, quantity)
+// 		res.json({ status: 'success', message: 'Producto agregado al carrito' })
+// 	} catch (error) {
+// 		res.status(500).json({
+// 			msg: `Error interno del servidor en cartController.addProductToCartB: ${error}`,
+// 		})
+// 	}
+// }
+
+export const addProductToCartB = async (req, res) => {
+	try {
+		const { id } = req.params
+		const { quantity } = req.body
+		const userId = req.user._id
+		if (!userId) {
+			return res.status(400).json({ message: 'User ID is required' })
+		}
+
+		// Buscar el carrito del usuario
+		let cart = await cartManager.getCartByUserId(userId)
+
+		// Si no hay carrito, crear uno nuevo
+		if (!cart) {
+			cart = await cartManager.createCart(userId)
+		}
+
+		// Agregar el producto al carrito
+		cart = await cartManager.addProductToCartB(userId, cart._id, id, quantity)
+
+		res
+			.status(200)
+			.json({ cart, message: 'Tu producto fue agregado correctamente' })
+	} catch (error) {
+		res.status(500).json({ message: error.message })
+	}
+}
+
 export const purchaseCart = async (req, res, next) => {
 	try {
 		const cartId = req.params.cid
@@ -275,5 +329,8 @@ export const purchaseCart = async (req, res, next) => {
 				errorTypes.ERROR_INTERNAL_ERROR,
 			),
 		)
+		res.status(500).json({
+			msg: `Error interno del servidor en cartController.purchaseCart: ${error}`,
+		})
 	}
 }

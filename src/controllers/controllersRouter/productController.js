@@ -40,6 +40,9 @@ export const getProductsPaginated = async (req, res, next) => {
 				errorTypes.ERROR_INTERNAL_ERROR,
 			),
 		)
+		res.status(500).json({
+			msg: `Error interno del servidor en productController.getProductsPaginated: ${error}`,
+		})
 	}
 }
 
@@ -49,7 +52,9 @@ export const getProducts = async (req, res) => {
 		res.json({ products })
 	} catch (error) {
 		console.error('Error al obtener los productos:', error)
-		res.status(500).send('Error al obtener los productos')
+		res.status(500).json({
+			msg: `Error interno del servidor en productController.getProducts: ${error}`,
+		})
 	}
 }
 
@@ -69,6 +74,9 @@ export const getProductById = async (req, res, next) => {
 	} catch (error) {
 		logger.error(`Error getting product by ID: ${error.message}`)
 		next(error)
+		res.status(500).json({
+			msg: `Error interno del servidor en productController.getProductById: ${error}`,
+		})
 	}
 }
 
@@ -87,6 +95,9 @@ export const addProduct = async (req, res, next) => {
 				errorTypes.ERROR_INVALID_ARGUMENTS,
 			),
 		)
+		res.status(500).json({
+			msg: `Error interno del servidor en productController.addProduct: ${error}`,
+		})
 	}
 }
 
@@ -105,6 +116,9 @@ export const updateProduct = async (req, res, next) => {
 				errorTypes.ERROR_DATA,
 			),
 		)
+		res.status(500).json({
+			msg: `Error interno del servidor en productController.updateProduct: ${error}`,
+		})
 	}
 }
 
@@ -140,5 +154,8 @@ export const deleteProduct = async (req, res, next) => {
 				errorTypes.ERROR_DATA,
 			),
 		)
+		res.status(500).json({
+			msg: `Error interno del servidor en productController.deleteProduct: ${error}`,
+		})
 	}
 }

@@ -1,8 +1,9 @@
 import productModel from '../persistencia/models/productsDTO.js'
+import logger from '../middlewares/logger.js'
 
 export default class ProductManagerNew {
 	constructor() {
-		console.log('Trabajando con ProductManager')
+		logger.info('Trabajando con ProductManager')
 	}
 
 	getAll = async (limit) => {
@@ -10,7 +11,7 @@ export default class ProductManagerNew {
 			const result = await productModel.find().limit(limit)
 			return result
 		} catch (error) {
-			console.error('Error al obtener todos los productos:', error)
+			logger.error('Error al obtener todos los productos:', error)
 			throw new Error('No se pudieron obtener todos los productos')
 		}
 	}
@@ -20,7 +21,7 @@ export default class ProductManagerNew {
 			const product = await productModel.findById(id)
 			return product
 		} catch (error) {
-			console.error('Error al buscar el producto por ID:', error)
+			logger.error('Error al buscar el producto por ID:', error)
 			throw new Error('No se pudo encontrar el producto')
 		}
 	}
@@ -30,7 +31,7 @@ export default class ProductManagerNew {
 			const result = await productModel.find({ brand: brand })
 			return result
 		} catch (error) {
-			console.error('Error al buscar productos por marca:', error)
+			logger.error('Error al buscar productos por marca:', error)
 			throw new Error('No se pudieron obtener los productos por marca')
 		}
 	}
@@ -54,7 +55,7 @@ export default class ProductManagerNew {
 			)
 			return result
 		} catch (error) {
-			console.error('Error al actualizar el producto:', error)
+			logger.error('Error al actualizar el producto:', error)
 			throw new Error('No se pudo actualizar el producto')
 		}
 	}

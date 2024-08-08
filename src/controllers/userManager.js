@@ -1,9 +1,10 @@
 import { createHash } from '../utils.js'
 import userModel from '../persistencia/models/usersDTO.js'
+import logger from '../middlewares/logger.js'
 
 export default class UserManager {
 	constructor() {
-		console.log('Constructor UserManager')
+		logger.info('Constructor UserManager')
 	}
 
 	getAllUsers = async () => {
@@ -11,7 +12,7 @@ export default class UserManager {
 			const result = await userModel.find()
 			return result
 		} catch (error) {
-			console.error(`Error al obtener todos los usuarios: ${error}`)
+			logger.error(`Error al obtener todos los usuarios: ${error}`)
 			throw new Error('Error al obtener todos los usuarios')
 		}
 	}
@@ -21,7 +22,7 @@ export default class UserManager {
 			const user = await userModel.findById(id)
 			return user
 		} catch (error) {
-			console.error(`Error al obtener el usuario por ID: ${error}`)
+			logger.error(`Error al obtener el usuario por ID: ${error}`)
 			throw new Error('Error al obtener el usuario por ID')
 		}
 	}
@@ -31,7 +32,7 @@ export default class UserManager {
 			const result = await userModel.findOne({ email })
 			return result
 		} catch (error) {
-			console.error(`Error al obtener el usuario por email: ${error}`)
+			logger.error(`Error al obtener el usuario por email: ${error}`)
 			throw new Error('Error al obtener el usuario por email')
 		}
 	}
@@ -42,7 +43,7 @@ export default class UserManager {
 			const result = await userModel.create(userData)
 			return result
 		} catch (error) {
-			console.error(`Error al crear el usuario: ${error}`)
+			logger.error(`Error al crear el usuario: ${error}`)
 			throw new Error('Error al crear el usuario')
 		}
 	}
@@ -55,7 +56,7 @@ export default class UserManager {
 			const result = await userModel.updateOne({ _id: id }, { $set: userData })
 			return result
 		} catch (error) {
-			console.error(`Error al actualizar el usuario: ${error}`)
+			logger.error(`Error al actualizar el usuario: ${error}`)
 			throw new Error('Error al actualizar el usuario')
 		}
 	}
@@ -65,7 +66,7 @@ export default class UserManager {
 			const result = await userModel.deleteOne({ _id: id })
 			return result
 		} catch (error) {
-			console.error(`Error al eliminar el usuario: ${error}`)
+			logger.error(`Error al eliminar el usuario: ${error}`)
 			throw new Error('Error al eliminar el usuario')
 		}
 	}
@@ -76,7 +77,7 @@ export default class UserManager {
 			const users = await userModel.find().populate('cart.product')
 			return users
 		} catch (error) {
-			console.error(`Error al obtener los usuarios con carrito: ${error}`)
+			logger.error(`Error al obtener los usuarios con carrito: ${error}`)
 			throw new Error('Error al obtener los usuarios con carrito')
 		}
 	}
@@ -91,7 +92,7 @@ export default class UserManager {
 			const users = await userModel.paginate({}, options)
 			return users
 		} catch (error) {
-			console.error(`Error al realizar la paginación: ${error}`)
+			logger.error(`Error al realizar la paginación: ${error}`)
 			throw new Error('Error al realizar la paginación')
 		}
 	}

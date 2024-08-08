@@ -1,9 +1,10 @@
 import cartModel from '../persistencia/models/cartsDTO.js'
 import productModel from '../persistencia/models/productsDTO.js'
+import logger from '../middlewares/logger.js'
 
 export default class CartManagerNew {
 	constructor() {
-		console.log('Trabajando con cartManager')
+		logger.info('Trabajando con cartManager')
 	}
 	async updateCart(cartId, updatedData) {
 		try {
@@ -27,7 +28,7 @@ export default class CartManagerNew {
 
 			return result
 		} catch (error) {
-			console.error('Error updating cart:', error)
+			logger.error('Error updating cart:', error)
 			throw error
 		}
 	}
@@ -51,7 +52,7 @@ export default class CartManagerNew {
 			await cart.save()
 			return cart
 		} catch (error) {
-			console.error(
+			logger.error(
 				'Error al actualizar la cantidad del producto:',
 				error.message,
 			)
@@ -67,7 +68,7 @@ export default class CartManagerNew {
 			cart.products = []
 			return await cart.save()
 		} catch (error) {
-			console.error('Error al eliminar todos los productos del carrito:', error)
+			logger.error('Error al eliminar todos los productos del carrito:', error)
 			return null
 		}
 	}
@@ -77,16 +78,25 @@ export default class CartManagerNew {
 			const result = await cartModel.findById(id)
 			return result
 		} catch (error) {
-			console.error('Error al buscar')
+			logger.error('Error al buscar')
 		}
 	}
+
+	/**
+	 * Create cart
+	 *
+	 * @param userId {ObjectId}
+	 *
+	 * @returns {cartModel}
+	 */
 	createCart = async (userId) => {
 		try {
-			const newCart = new cartModel({ user: userId, products: [] })
+			const newCart = new cartModel({ userId, products: [] })
 			await newCart.save()
+
 			return newCart
 		} catch (error) {
-			console.error('Error al crear el carrito:', error)
+			logger.error('Error al crear el carrito:', error)
 			throw new Error('No se pudo crear el carrito')
 		}
 	}
@@ -96,7 +106,7 @@ export default class CartManagerNew {
 			const cart = await cartModel.findOne({ userId })
 			return cart
 		} catch (error) {
-			console.error('Error al obtener el carrito por userID:', error.message)
+			logger.error('Error al obtener el carrito por userID:', error.message)
 			throw new Error('No se pudo obtener el carrito')
 		}
 	}
@@ -109,30 +119,51 @@ export default class CartManagerNew {
 			}
 			return product
 		} catch (error) {
-			console.error('Error al obtener el producto por ID:', error)
+			logger.error('Error al obtener el producto por ID:', error)
 			throw new Error('No se pudo encontrar el producto')
 		}
 	}
 
-	addProductToCartB = async (cartId, productId, quantity) => {
+	// static async addProductToCartB(userId, cartId, productId, quantity) {
+	// 	const cart = await cartModel.findById(cartId)
+	// 	const productIndex = cart.products.findIndex(
+	// 		(p) => p.productId.toString() === productId,
+	// 	)
+
+	// 	if (productIndex !== -1) {
+	// 		// Si el producto ya existe en el carrito, actualizar la cantidad
+	// 		cart.products[productIndex].quantity += quantity
+	// 	} else {
+	// 		// Si el producto no existe, agregarlo al carrito
+	// 		cart.products.push({ productId, quantity })
+	// 	}
+
+	// 	return await cart.save()
+	// }
+
+	addProductToCartB = async (userId, cartId, productId, quantity) => {
 		try {
 			const cart = await cartModel.findById(cartId)
+
 			if (!cart) {
 				throw new Error('Carrito no encontrado')
+			}
+			if (cart.userId.toString() !== userId.toString()) {
+				throw new Error('El carrito no pertenece a este usuario')
 			}
 
 			const productIndex = cart.products.findIndex(
 				(p) => p.productId.toString() === productId,
 			)
 			if (productIndex > -1) {
-				cart.products[productIndex].quantity += quantity
+				cart.products[productIndex].quantity += Number.parseInt(quantity)
 			} else {
-				cart.products.push({ productId, quantity })
+				cart.products.push({ productId, quantity: Number.parseInt(quantity) })
 			}
 
 			return await cart.save()
 		} catch (error) {
-			console.error('Error al agregar el producto al carrito:', error)
+			logger.error('Error al agregar el producto al carrito:', error)
 			throw new Error('No se pudo agregar el producto al carrito')
 		}
 	}
@@ -164,7 +195,7 @@ export default class CartManagerNew {
 			await cart.save()
 			return cart
 		} catch (error) {
-			console.error('Error al agregar producto al carrito:', error.message)
+			logger.error('Error al agregar producto al carrito:', error.message)
 			throw new Error('No se pudo agregar el producto al carrito')
 		}
 	}
@@ -185,7 +216,7 @@ export default class CartManagerNew {
 			await cart.save()
 			return cart
 		} catch (error) {
-			console.error('Error al eliminar producto del carrito:', error.message)
+			logger.error('Error al eliminar producto del carrito:', error.message)
 			throw new Error('No se pudo eliminar el producto del carrito')
 		}
 	}

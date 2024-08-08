@@ -51,6 +51,8 @@
 
         async function addToCart(productId) {
             const quantity = document.getElementById(`quantity-${productId}`).value;
+            console.log(quantity)
+            console.log(productId)
             try {
                 const response = await fetch(`/api/carts/add/${productId}`, {
                     method: 'POST',
@@ -61,6 +63,7 @@
                     body: JSON.stringify({ quantity })
                 });
                 const result = await response.json();
+                console.log(result)
                 alert(result.message);
             } catch (error) {
                 console.error('Error al agregar el producto al carrito:', error);

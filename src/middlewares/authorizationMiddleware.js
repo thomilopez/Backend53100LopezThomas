@@ -19,6 +19,7 @@ class AuthorizationMiddleware {
 	isUser(req, res, next) {
 		try {
 			const user = req.user
+
 			if (user.rol === 'user') {
 				next()
 			} else {

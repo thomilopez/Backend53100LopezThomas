@@ -2,6 +2,16 @@ import express from 'express'
 import handlebars from 'express-handlebars'
 import { Server } from 'socket.io'
 import path from 'node:path'
+import passport from 'passport'
+import MongoStore from 'connect-mongo'
+import session from 'express-session'
+import cookieParser from 'cookie-parser'
+import cors from 'cors'
+import nodemailer from 'nodemailer'
+import twilio from 'twilio'
+import compression from 'express-compression'
+import swaggerJSDoc from 'swagger-jsdoc'
+import swaggerUiExpress from 'swagger-ui-express'
 import productsRouter from './routes/productsRouter.js'
 import cartsRouter from './routes/cartsRouter.js'
 import chatRouter from './routes/chatRouter.js'
@@ -9,32 +19,23 @@ import userRouter from './routes/userRouter.js'
 import router from './routes/viewsRouter.js'
 import __dirname from './utils.js'
 import ProductManagerNew from './controllers/productManagerNew.js'
-import MongoStore from 'connect-mongo'
-import session from 'express-session'
 import sessionRouter from './routes/sessions.router.js'
-import passport from 'passport'
 import initializePassport from './config/passaportConfig.js'
-import cookieParser from 'cookie-parser'
 import { entorno } from './config/config.js'
-import cors from 'cors'
-import nodemailer from 'nodemailer'
-import twilio from 'twilio'
 import MongoSingleton from './persistencia/mongoSingleton.js'
-import compression from 'express-compression'
 import errorHandler from './middlewares/errorHandler.js'
 import logger, { addLogger } from './middlewares/logger.js'
-import swaggerJSDoc from 'swagger-jsdoc'
-import swaggerUiExpress from 'swagger-ui-express'
 
 const productManager = new ProductManagerNew()
 const DB_URL2 = entorno.mongoURL
 // Crear aplicación Express
 const app = express()
+app.disable('x-powered-by')
 const PORT = entorno.port
 
 // Configuración de socket.io
 const server = app.listen(PORT, () => {
-	console.log(`Servidor en ejecución en http://localhost:${PORT}`)
+	logger.info(`Servidor en ejecución en http://localhost:${PORT}`)
 })
 const io = new Server(server)
 
@@ -155,7 +156,7 @@ app.get('/sms', async (req, res) => {
 // Middleware para manejar errores de autenticación de Passport
 app.use((err, req, res, next) => {
 	if (err) {
-		console.error(err)
+		logger.error(err)
 		res.status(401).json({ error: 'Error de autenticación' })
 	}
 })

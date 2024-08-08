@@ -27,6 +27,9 @@ export const getAllUsers = async (req, res) => {
 				errorTypes.ERROR_INTERNAL_ERROR,
 			),
 		)
+		res.status(500).json({
+			msg: `Error interno del servidor en userController.getAllUsers: ${error}`,
+		})
 	}
 }
 export const deleteInactiveUsers = async (req, res) => {
@@ -55,6 +58,9 @@ export const deleteInactiveUsers = async (req, res) => {
 			.status(500)
 			.json({ message: 'Error al eliminar usuarios inactivos', error })
 	}
+	res.status(500).json({
+		msg: `Error interno del servidor en userController.deleteInactiveUsers: ${error}`,
+	})
 }
 
 export const getUserById = async (req, res) => {
@@ -68,9 +74,9 @@ export const getUserById = async (req, res) => {
 		}
 	} catch (error) {
 		logger.error(`Error getting user by ID: ${error.message}`)
-		res
-			.status(500)
-			.json({ message: 'Error al obtener el usuario por ID', error })
+		res.status(500).json({
+			msg: `Error interno del servidor en userController.getUserById: ${error}`,
+		})
 	}
 }
 
@@ -81,7 +87,9 @@ export const createUser = async (req, res) => {
 		res.status(201).json({ result })
 	} catch (error) {
 		logger.error(`Error creating user: ${error.message}`)
-		res.status(500).json({ message: 'Error al crear el usuario', error })
+		res.status(500).json({
+			msg: `Error interno del servidor en userController.createUser: ${error}`,
+		})
 	}
 }
 
@@ -104,10 +112,9 @@ export const updateUser = async (req, res) => {
 			user: updatedUser,
 		})
 	} catch (error) {
+		logger.error(`Error al actualizar el usuario ${error}`)
 		res.status(500).json({
-			status: 'error',
-			message: 'Error updating user',
-			error: error.message || 'An unexpected error occurred.',
+			msg: `Error interno del servidor en userController.updatedUser: ${error}`,
 		})
 	}
 }
@@ -125,8 +132,10 @@ export const deleteUser = async (req, res) => {
 			res.status(404).json({ error: 'Usuario no encontrado' })
 		}
 	} catch (error) {
-		console.error(`Error al eliminar el usuario: ${error}`)
-		res.status(500).json({ message: 'Error al eliminar el usuario', error })
+		logger.error(`Error al eliminar el usuario: ${error}`)
+		res.status(500).json({
+			msg: `Error interno del servidor en userController.deleteUser: ${error}`,
+		})
 	}
 }
 
@@ -142,7 +151,10 @@ export const loginUser = async (req, res) => {
 				.send({ status: 'success', message: user.message })
 		}
 	} catch (error) {
-		res.send({ status: 'error', message: error })
+		logger.error(`Error al intentar iniciar sesión ${error}`)
+		res.status(500).json({
+			msg: `Error interno del servidor en userController.loginUser: ${error}`,
+		})
 	}
 }
 
@@ -159,10 +171,10 @@ export const getCurrentUser = async (req, res) => {
 		}
 		res.status(200).json(userDTO)
 	} catch (error) {
-		console.error(`Error al obtener el usuario actual: ${error}`)
-		res
-			.status(500)
-			.json({ message: 'Error al obtener el usuario actual', error })
+		logger.error(`Error al obtener el usuario actual: ${error}`)
+		res.status(500).json({
+			msg: `Error interno del servidor en userController.getCurrentUser: ${error}`,
+		})
 	}
 }
 
@@ -175,7 +187,10 @@ export const logoutUser = async (req, res) => {
 		})
 		res.status(200).json({ message: 'Se deslogueo correctamente' })
 	} catch (error) {
-		res.status(500).json({ message: 'Error al cerrar sesion', error })
+		logger.error(`Error al intentar cerrar sesión ${error}`)
+		res.status(500).json({
+			msg: `Error interno del servidor en userController.logoutUser: ${error}`,
+		})
 	}
 }
 
@@ -194,10 +209,10 @@ export const changeUserRole = async (req, res) => {
 		await user.save()
 		res.status(200).json({ message: `Rol del usuario cambiado a ${newRole}` })
 	} catch (error) {
-		console.error(`Error al cambiar el rol del usuario: ${error}`)
-		res
-			.status(500)
-			.json({ message: 'Error al cambiar el rol del usuario', error })
+		logger.error(`Error al cambiar el rol del usuario: ${error}`)
+		res.status(500).json({
+			msg: `Error interno del servidor en userController.changeUserRole: ${error}`,
+		})
 	}
 }
 
@@ -222,7 +237,10 @@ export const uploadDocuments = async (req, res) => {
 
 		res.send({ status: 'success', message: 'Documentos subidos exitosamente' })
 	} catch (error) {
-		res.status(500).send({ status: 'error', message: error.message })
+		logger.error(`Error al cargar el documento ${error}`)
+		res.status(500).json({
+			msg: `Error interno del servidor en userController.uploadDocuments: ${error}`,
+		})
 	}
 }
 
@@ -258,6 +276,11 @@ export const updateToPremium = async (req, res) => {
 
 		res.send({ status: 'success', message: 'Usuario actualizado a premium' })
 	} catch (error) {
-		res.status(500).send({ status: 'error', message: error.message })
+		logger.error(`Error al actualizar a premium ${error}`)
+		res
+			.status(500)
+			.json({
+				msg: `Error interno del servidor en userController.updateToPremium: ${error}`,
+			})
 	}
 }
