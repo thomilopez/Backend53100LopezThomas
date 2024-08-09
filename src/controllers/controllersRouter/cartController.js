@@ -201,30 +201,6 @@ export const addProductToCart = async (req, res, next) => {
 	}
 }
 
-// export const addProductToCartB = async (req, res) => {
-// 	const { id } = req.params
-// 	const { quantity } = req.body
-// 	const userId = req.user.id
-// 	try {
-// 		let cart = await cartManager.getCartByUserId(userId)
-// 		if (!cart) {
-// 			cart = await cartManager.createCart(userId)
-// 		}
-// 		const product = await cartManager.getProductById(id)
-// 		if (!product) {
-// 			return res
-// 				.status(404)
-// 				.json({ status: 'error', message: 'Producto no encontrado' })
-// 		}
-// 		await cartManager.addProductToCartB(cart._id, id, quantity)
-// 		res.json({ status: 'success', message: 'Producto agregado al carrito' })
-// 	} catch (error) {
-// 		res.status(500).json({
-// 			msg: `Error interno del servidor en cartController.addProductToCartB: ${error}`,
-// 		})
-// 	}
-// }
-
 export const addProductToCartB = async (req, res) => {
 	try {
 		const { id } = req.params

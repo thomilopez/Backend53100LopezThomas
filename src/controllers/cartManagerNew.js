@@ -82,13 +82,6 @@ export default class CartManagerNew {
 		}
 	}
 
-	/**
-	 * Create cart
-	 *
-	 * @param userId {ObjectId}
-	 *
-	 * @returns {cartModel}
-	 */
 	createCart = async (userId) => {
 		try {
 			const newCart = new cartModel({ userId, products: [] })
@@ -123,23 +116,6 @@ export default class CartManagerNew {
 			throw new Error('No se pudo encontrar el producto')
 		}
 	}
-
-	// static async addProductToCartB(userId, cartId, productId, quantity) {
-	// 	const cart = await cartModel.findById(cartId)
-	// 	const productIndex = cart.products.findIndex(
-	// 		(p) => p.productId.toString() === productId,
-	// 	)
-
-	// 	if (productIndex !== -1) {
-	// 		// Si el producto ya existe en el carrito, actualizar la cantidad
-	// 		cart.products[productIndex].quantity += quantity
-	// 	} else {
-	// 		// Si el producto no existe, agregarlo al carrito
-	// 		cart.products.push({ productId, quantity })
-	// 	}
-
-	// 	return await cart.save()
-	// }
 
 	addProductToCartB = async (userId, cartId, productId, quantity) => {
 		try {
